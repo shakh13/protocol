@@ -5,6 +5,51 @@ from .models import *
 User = get_user_model()
 
 
+class LaboratorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Laboratory  # Ensure Laboratory is correctly imported from models
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'is_superuser']
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+    laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+
+    class Meta:
+        model = Certificate
+        fields = '__all__'
+
+
+class MachinesSerializer(serializers.ModelSerializer):
+    laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+
+    class Meta:
+        model = Machines
+        fields = '__all__'
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+
+    class Meta:
+        model = Client
+        fields = '__all__'
+
+
+class BuildingSerializer(serializers.ModelSerializer):
+    laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+
+    class Meta:
+        model = Building
+        fields = '__all__'
+        depth = 1
+
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()

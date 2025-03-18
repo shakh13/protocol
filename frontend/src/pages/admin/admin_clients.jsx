@@ -1,6 +1,6 @@
 import {Container, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip} from "@mui/material";
 import Typography from "@mui/material/Typography";
-import {cloneElement, useState} from "react";
+import {useEffect, useState} from "react";
 import Divider from "@mui/material/Divider";
 import * as React from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -11,14 +11,11 @@ import Link from "@mui/material/Link";
 import AddClient from "./clients/add_client.jsx";
 import DeleteClient from "./clients/delete_client.jsx";
 import EditClient from "./clients/edit_client.jsx";
+import AxiosInstance from "../../components/axios_instance.jsx";
+import Waiting from "../../components/Waiting.jsx";
+import TextField from "@mui/material/TextField";
+import NoData from "../../components/NoData.jsx";
 
-function generate(element) {
-    return [0, 1, 2, 3, 4].map((value) =>
-        cloneElement(element, {
-            key: value,
-        }),
-    );
-}
 
 export default function AdminClients() {
     const [addClientOpen, setAddClientOpen] = useState(false);
@@ -26,6 +23,27 @@ export default function AdminClients() {
     const [editClientId, setEditClientId] = useState(0);
     const [deleteClientId, setDeleteClientId] = useState(0);
     const [deleteClientOpen, setDeleteClientOpen] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchFilter, setSearchFilter] = useState("");
+
+
+    function getData() {
+        setLoading(true);
+        AxiosInstance.get("clients/")
+            .then((response) => {
+                setClients(response.data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                setLoading(true);
+                console.log(error);
+            });
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     const handleAddClientOpen = () => {
         setAddClientOpen(true);
@@ -55,51 +73,101 @@ export default function AdminClients() {
                         <AddIcon/>
                     </IconButton>
                 </Tooltip>
+                <TextField
+                    id="search_clients_field"
+                    label="Поиск"
+                    variant="outlined"
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                    size="small"
+                    sx={{
+                        minWidth: '100px',
+                        width: '300px',
+                        margin: 'auto 0 auto auto',
+                    }}
+                />
             </Box>
-            <List sx={{width: '100%', minWidth: 360, bgcolor: 'background.paper'}}>
-                {generate(
-                    <>
-                        <ListItem alignItems="flex-start"
-                                  sx={{padding: "8px 0"}}
-                                  secondaryAction={
-                                      <>
-                                          <Tooltip title="Редактировать">
-                                              <IconButton
-                                                  edge="end"
-                                                  aria-label="Редактировать"
-                                                  onClick={handleEditClientOpen(2)}
-                                              >
-                                                  <EditIcon/>
-                                              </IconButton>
-                                          </Tooltip>
-                                          <Tooltip title="Удалить">
-                                              <IconButton
-                                                  edge="end"
-                                                  aria-label="Удалить"
-                                                  sx={{marginLeft: '15px'}}
-                                                  onClick={handleDeleteClientOpen(2)}
-                                              >
-                                                  <DeleteIcon/>
-                                              </IconButton>
-                                          </Tooltip>
-                                      </>
-                                  }
-                        >
-                            <ListItemAvatar sx={{marginY: 'auto'}}>
-                                <Typography component="div">12</Typography>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={(<Link href="/admin/client/1" underline="none">Название клиента</Link>)}
-                                secondary="Адрес"
+            {
+                loading
+                    ? <Waiting/>
+                    : <>
+                        <List sx={{width: '100%', minWidth: 360, bgcolor: 'background.paper'}}>
+                            {clients.length === 0 && <NoData/>}
+                            {
+                                clients
+                                    .filter((client) => client.name.toLowerCase().search(searchFilter.toLowerCase()) > -1)
+                                    .map((client) => (
+                                        <ListItem alignItems="flex-start"
+                                                  key={"client_" + client.id}
+                                                  sx={{padding: "8px 0"}}
+                                                  secondaryAction={
+                                                      <>
+                                                          <Tooltip title="Редактировать">
+                                                              <IconButton
+                                                                  edge="end"
+                                                                  aria-label="Редактировать"
+                                                                  onClick={handleEditClientOpen(client.id)}
+                                                              >
+                                                                  <EditIcon/>
+                                                              </IconButton>
+                                                          </Tooltip>
+                                                          <Tooltip title="Удалить">
+                                                              <IconButton
+                                                                  edge="end"
+                                                                  aria-label="Удалить"
+                                                                  sx={{marginLeft: '15px'}}
+                                                                  onClick={handleDeleteClientOpen(client.id)}
+                                                              >
+                                                                  <DeleteIcon/>
+                                                              </IconButton>
+                                                          </Tooltip>
+                                                      </>
+                                                  }
+                                        >
+                                            <ListItemAvatar sx={{marginY: 'auto'}}>
+                                                <Typography component="div">{client.id}</Typography>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={(
+                                                    <Link href={"/admin/client/" + client.id} underline="none">
+                                                        {client.name}
+                                                    </Link>
+                                                )}
+                                                secondary={client.address}
+                                            />
+
+                                            <Divider/>
+                                        </ListItem>
+                                    ))
+                            }
+                        </List>
+                        {
+                            addClientOpen &&
+                            <AddClient
+                                open={addClientOpen}
+                                setOpen={setAddClientOpen}
+                                updateData={getData}
                             />
-                        </ListItem>
-                        <Divider variant="inset" component="li"/>
+                        }
+                        {
+                            editClientOpen &&
+                            <EditClient
+                                open={editClientOpen}
+                                setOpen={setEditClientOpen}
+                                id={editClientId}
+                                updateData={getData}
+                            />
+                        }
+                        {
+                            deleteClientOpen &&
+                            <DeleteClient
+                                open={deleteClientOpen}
+                                setOpen={setDeleteClientOpen}
+                                id={deleteClientId}
+                                updateData={getData}
+                            />
+                        }
                     </>
-                )}
-            </List>
-            <AddClient open={addClientOpen} setOpen={setAddClientOpen}/>
-            <EditClient open={editClientOpen} setOpen={setEditClientOpen} id={editClientId}/>
-            <DeleteClient open={deleteClientOpen} setOpen={setDeleteClientOpen} id={deleteClientId}/>
+            }
         </Container>
     )
 }

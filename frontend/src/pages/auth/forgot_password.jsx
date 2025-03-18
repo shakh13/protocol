@@ -24,13 +24,12 @@ function ForgotPassword({open, handleClose}) {
                 },
             }}
         >
-            <DialogTitle>Reset password</DialogTitle>
+            <DialogTitle>Сбрось пароля</DialogTitle>
             <DialogContent
                 sx={{display: 'flex', flexDirection: 'column', gap: 2, width: '100%'}}
             >
                 <DialogContentText>
-                    Enter your account&apos;s email address, and we&apos;ll send you a link to
-                    reset your password.
+                    Введите Email, и мы отправим вам ссылку для сброса пароля.
                 </DialogContentText>
                 <OutlinedInput
                     autoFocus
@@ -38,16 +37,15 @@ function ForgotPassword({open, handleClose}) {
                     margin="dense"
                     id="email"
                     name="email"
-                    label="Email address"
-                    placeholder="Email address"
+                    placeholder="Email адрес"
                     type="email"
                     fullWidth
                 />
             </DialogContent>
             <DialogActions sx={{pb: 3, px: 3}}>
-                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleClose}>Отмена</Button>
                 <Button variant="contained" type="submit">
-                    Continue
+                    Продолжить
                 </Button>
             </DialogActions>
         </Dialog>

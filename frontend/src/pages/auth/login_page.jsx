@@ -1,9 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -12,6 +9,8 @@ import Typography from '@mui/material/Typography';
 import MuiCard from '@mui/material/Card';
 import {styled} from '@mui/material/styles';
 import ForgotPassword from "./forgot_password.jsx";
+import AxiosInstance from "../../components/axios_instance.jsx";
+import {useEffect} from "react";
 
 const Card = styled(MuiCard)(({theme}) => ({
     display: 'flex',
@@ -32,12 +31,29 @@ const Card = styled(MuiCard)(({theme}) => ({
     }),
 }));
 
-export default function LoginPage(props) {
+export default function LoginPage() {
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
+    const [showMessage, setShowMessage] = React.useState(false);
+
+    const checkLogin = () => {
+        AxiosInstance.get('me').then((response) => {
+            localStorage.setItem('fullname', response.data.fullname);
+            if (response.data.isAdmin) {
+                localStorage.setItem('isAdmin', true);
+            }
+            window.location.href = response.data.isAdmin ? '/admin' : '/protocols';
+        }).catch((error) => {
+            // localStorage.clear();
+        });
+    }
+
+    useEffect(() => {
+        checkLogin();
+    }, []);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -47,19 +63,8 @@ export default function LoginPage(props) {
         setOpen(false);
     };
 
-    const handleSubmit = (event) => {
-        if (emailError || passwordError) {
-            event.preventDefault();
-            return;
-        }
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-    };
-
     const validateInputs = () => {
+        setShowMessage(false);
         const email = document.getElementById('email');
         const password = document.getElementById('password');
 
@@ -67,7 +72,7 @@ export default function LoginPage(props) {
 
         if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
             setEmailError(true);
-            setEmailErrorMessage('Please enter a valid email address.');
+            setEmailErrorMessage('Пожалуйста, введите действительный Email');
             isValid = false;
         } else {
             setEmailError(false);
@@ -76,15 +81,31 @@ export default function LoginPage(props) {
 
         if (!password.value || password.value.length < 6) {
             setPasswordError(true);
-            setPasswordErrorMessage('Password must be at least 6 characters long.');
+            setPasswordErrorMessage('Пароль должен быть длиной не менее 6 символов.');
             isValid = false;
         } else {
             setPasswordError(false);
             setPasswordErrorMessage('');
         }
 
-        // return isValid;
-        window.location.href = '/protocols';
+        if (isValid) {
+            AxiosInstance.post("login/", {
+                email: email.value,
+                password: password.value,
+            }).then((response) => {
+                console.log(response);
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("email", response.data.user.email);
+                localStorage.setItem("fullname", response.data.fullname);
+                if (response.data.isAdmin) {
+                    localStorage.setItem("isAdmin", response.data.isAdmin);
+                }
+                window.location.href = response.data.isAdmin ? "/admin" : "/protocols";
+            }).catch((error) => {
+                setShowMessage(true);
+                localStorage.clear();
+            });
+        }
     };
 
     return (
@@ -101,12 +122,9 @@ export default function LoginPage(props) {
                     variant="h4"
                     sx={{width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)'}}
                 >
-                    Sign in
+                    Авторизация
                 </Typography>
                 <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                    noValidate
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -132,7 +150,7 @@ export default function LoginPage(props) {
                         />
                     </FormControl>
                     <FormControl>
-                        <FormLabel htmlFor="password">Password</FormLabel>
+                        <FormLabel htmlFor="password">Пароль</FormLabel>
                         <TextField
                             error={passwordError}
                             helperText={passwordErrorMessage}
@@ -148,42 +166,28 @@ export default function LoginPage(props) {
                             color={passwordError ? 'error' : 'primary'}
                         />
                     </FormControl>
-                    <FormControlLabel
-                        control={<Checkbox value="remember" color="primary"/>}
-                        label="Remember me"
-                    />
-
+                    {showMessage &&
+                        <Box sx={{color: "red", width: "100%", textAlign: "center", fontSize: 14}}>Email или пароль
+                            неправильно</Box>}
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         onClick={validateInputs}
                     >
-                        Sign in
+                        Войти
                     </Button>
                     <Link
                         component="button"
                         type="button"
                         onClick={handleClickOpen}
                         variant="body2"
+                        underline="none"
                         sx={{alignSelf: 'center'}}
                     >
-                        Forgot your password?
+                        Забыли пароль?
                     </Link>
                     <ForgotPassword open={open} handleClose={handleClose}/>
-                </Box>
-                <Divider>or</Divider>
-                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                    <Typography sx={{textAlign: 'center'}}>
-                        Don&apos;t have an account?{' '}
-                        <Link
-                            to="/signup"
-                            variant="body2"
-                            sx={{alignSelf: 'center'}}
-                        >
-                            Sign up
-                        </Link>
-                    </Typography>
                 </Box>
             </Card>
         </Box>

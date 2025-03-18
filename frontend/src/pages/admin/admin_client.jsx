@@ -18,9 +18,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Link from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
 import * as React from "react";
-import AddBuilding from "./client/add_building.jsx";
-import EditBuilding from "./client/edit_building.jsx";
-import DeleteBuilding from "./client/delete_building.jsx";
+import AddBuilding from "./buildings/add_building.jsx";
+import EditBuilding from "./buildings/edit_building.jsx";
+import DeleteBuilding from "./buildings/delete_building.jsx";
+import TextField from "@mui/material/TextField";
+import MySearchField from "../../components/forms/MySearchField.jsx";
+import Box from "@mui/material/Box";
 
 function generate(element) {
     return [0, 1, 2, 3, 4].map((value) =>
@@ -38,6 +41,9 @@ export default function AdminClient() {
     const [deleteBuildingOpen, setDeleteBuildingOpen] = useState(false);
     const [editBuildingId, setEditBuildingId] = useState(0);
     const [deleteBuildingId, setDeleteBuildingId] = useState(0);
+    const [buildingSearchFilter, setBuildingSearchFilter] = useState("");
+    const [protocolSearchFilter, setProtocolSearchFilter] = useState("");
+
 
     const handleAddBuildingOpen = () => {
         setAddBuildingOpen(true);
@@ -62,7 +68,10 @@ export default function AdminClient() {
                     aria-controls="panel3-content"
                     id="panel3-header"
                 >
-                    <Typography component="span">Объекты</Typography>
+                    <Box sx={{marginY: 'auto'}}>
+                        <Typography component="span">Объекты</Typography>
+                    </Box>
+                    <MySearchField name={"search_building_field"} setSearchFilter={setBuildingSearchFilter}/>
                 </AccordionSummary>
                 <AccordionDetails>
                     <List sx={{width: '100%', minWidth: 360, bgcolor: 'transparent'}}>
@@ -112,9 +121,10 @@ export default function AdminClient() {
                     <Button onClick={handleAddBuildingOpen}>Добавить</Button>
                 </AccordionActions>
             </Accordion>
-            <AddBuilding open={addBuildingOpen} setOpen={setAddBuildingOpen}/>
-            <EditBuilding open={editBuildingOpen} setOpen={setEditBuildingOpen} id={editBuildingId}/>
-            <DeleteBuilding open={deleteBuildingOpen} setOpen={setDeleteBuildingOpen} id={deleteBuildingId}/>
+            <AddBuilding open={addBuildingOpen} setOpen={setAddBuildingOpen} client={id}/>
+            <EditBuilding open={editBuildingOpen} setOpen={setEditBuildingOpen} id={editBuildingId} client={id}/>
+            <DeleteBuilding open={deleteBuildingOpen} setOpen={setDeleteBuildingOpen} id={deleteBuildingId}
+                            client={id}/>
 
             <Accordion defaultExpanded>
                 <AccordionSummary
@@ -122,7 +132,10 @@ export default function AdminClient() {
                     aria-controls="panel3-content"
                     id="panel3-header"
                 >
-                    <Typography component="span">Протоколы</Typography>
+                    <Box sx={{marginY: 'auto'}}>
+                        <Typography component="span">Протоколы</Typography>
+                    </Box>
+                    <MySearchField name={"search_protocol_field"} setSearchFilter={setProtocolSearchFilter}/>
                 </AccordionSummary>
                 <AccordionDetails>
                     <List sx={{width: '100%', minWidth: 360, bgcolor: 'transparent'}}>

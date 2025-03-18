@@ -12,15 +12,47 @@ import {useState, useEffect} from "react";
 import {useTheme} from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useForm} from "react-hook-form";
+import * as yup from "yup";
+import {yupResolver} from "@hookform/resolvers/yup";
+import AxiosInstance from "../../../components/axios_instance.jsx";
+import dayjs from "dayjs";
+import ErrorMessage from "../../../components/ErrorMessage.jsx";
 
 
 export default function EditClient(props) {
-    const {open, setOpen, id} = props;
+    const {open, setOpen, id, updateData} = props;
+    const [loading, setLoading] = useState(true);
+    const [editError, setEditError] = useState(false);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    const {control, handleSubmit, watch} = useForm({
+    function getData() {
+        setLoading(true);
+        AxiosInstance.get("clients/" + id + "/")
+            .then((response) => {
+                setValue('name', response.data.name);
+                setValue('address', response.data.address);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.log(error);
+                setLoading(true);
+            });
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
+
+    const schema = yup
+        .object({
+            name: yup.string().required('Введите название заказчика'),
+            address: yup.string().required('Введите адрес'),
+        });
+
+    const {control, handleSubmit, setValue} = useForm({
+        resolver: yupResolver(schema),
         defaultValues: {
             name: '',
             address: '',
@@ -28,7 +60,19 @@ export default function EditClient(props) {
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        setEditError(false);
+        AxiosInstance.put("clients/" + id + "/", {
+            name: data.name,
+            address: data.address,
+        })
+            .then((response) => {
+                updateData();
+                setOpen(false);
+            })
+            .catch((error) => {
+                setEditError(true);
+                console.log(error);
+            });
     };
     const handleClose = () => {
         setOpen(false);
@@ -55,7 +99,10 @@ export default function EditClient(props) {
                       style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                     <DialogContent>
                         <MyTextField name="name" label="Название" type="text" control={control}/>
-                        <MyTextField name="address" label="Адрес" type="address" control={control}/>
+                        <MyTextField name="address" label="Адрес" type="text" control={control}/>
+                        {editError &&
+                            <ErrorMessage message={"Ошибка редактирования"}/>
+                        }
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" autoFocus type={"submit"}>

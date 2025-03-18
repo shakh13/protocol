@@ -11,7 +11,7 @@ export default function MySelectField(props) {
     const selectColorStyles = {
         option: (styles) => ({
             ...styles,
-            backgroundColor: 'transparent',
+            backgroundColor: 'white',
             color: 'black',
         }),
     }

@@ -14,10 +14,11 @@ export default function MyTextField(props) {
                      formState,
                  }) =>
                     <TextField
+                        key={name}
                         autoFocus
                         required
                         margin="dense"
-                        label={label}
+                        placeholder={label}
                         type={type}
                         onChange={onChange}
                         value={value}

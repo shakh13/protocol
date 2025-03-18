@@ -12,10 +12,40 @@ import {useState, useEffect} from "react";
 import {useTheme} from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useForm} from "react-hook-form";
+import AxiosInstance from "../../../components/axios_instance.jsx";
 
 
 export default function EditBuilding(props) {
-    const {open, setOpen, id} = props;
+    const {open, setOpen, id, updateData, client} = props;
+    const [building, setBuilding] = useState({});
+    const [clients, setClients] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    function getData() {
+        setLoading(true);
+
+        AxiosInstance.get("clients/")
+            .then((response) => {
+                setClients(response.data);
+            })
+            .catch((error) => {
+                setLoading(true);
+                console.log(error);
+            });
+
+        AxiosInstance.get("buildings/" + id + "/")
+            .then((response) => {
+                setValue('name', response.data.name);
+                setValue('address', response.data.address);
+                setValue('prefix', response.data.prefix);
+            })
+            .catch((error) => {
+            });
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -24,6 +54,7 @@ export default function EditBuilding(props) {
         defaultValues: {
             name: '',
             address: '',
+            prefix: '',
         },
     });
 
@@ -56,6 +87,7 @@ export default function EditBuilding(props) {
                     <DialogContent>
                         <MyTextField name="name" label="Название" type="text" control={control}/>
                         <MyTextField name="address" label="Адрес" type="address" control={control}/>
+                        <MyTextField name="prefix" label="Префикс" type="address" control={control}/>
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" autoFocus type={"submit"}>

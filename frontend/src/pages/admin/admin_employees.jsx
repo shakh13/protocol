@@ -14,40 +14,11 @@ import {
     ListItemText, Tooltip,
 } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import AddEmployee from "./employee/add_employee.jsx";
 import EditEmployee from "./employee/edit_employee.jsx";
 import DeleteEmployee from "./employee/delete_employee.jsx";
 import Link from "@mui/material/Link";
-
-const initialRows = [
-    {
-        id: 1,
-        fullname: "Shaxzod Saidmurodov",
-        email: "vip.shaxi@gmail.com",
-    },
-    {
-        id: 2,
-        fullname: "Shaxzod Saidmurodov",
-        email: "vip.shaxi@gmail.com",
-    },
-    {
-        id: 3,
-        fullname: "Shaxzod Saidmurodov",
-        email: "vip.shaxi@gmail.com",
-    },
-    {
-        id: 4,
-        fullname: "Shaxzod Saidmurodov",
-        email: "vip.shaxi@gmail.com",
-    },
-    {
-        id: 5,
-        fullname: "Shaxzod Saidmurodov",
-        email: "vip.shaxi@gmail.com",
-    },
-];
 
 
 function generate(element) {

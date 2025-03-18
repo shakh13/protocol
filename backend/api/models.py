@@ -41,22 +41,30 @@ class Client(models.Model):
 class Building(models.Model):
     id = models.AutoField(primary_key=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey("CustomUser", on_delete=models.SET_NULL, null=True, blank=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    address = models.CharField(max_length=100, blank=True, null=True)
+    address = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
 
-class Equipment(models.Model):
+class Certificate(models.Model):
     id = models.AutoField(primary_key=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    certificate = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Machines(models.Model):
+    id = models.AutoField(primary_key=True)
+    laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE)
     certificate_number = models.CharField(max_length=100)
-    certificate_expiry_date = models.DateField(blank=True, null=True)
+    certificate_expiry_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -84,8 +92,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     laboratory = models.OneToOneField(Laboratory, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
-    clients = models.ManyToManyField(Client, null=True, blank=True)
-    buildings = models.ManyToManyField(Building, null=True, blank=True)
+    clients = models.ManyToManyField(Client, blank=True)
 
     objects = CustomUserManager()
 

@@ -24,6 +24,7 @@ export default function AddBuilding(props) {
         defaultValues: {
             name: '',
             address: '',
+            prefix: '',
         },
     });
 
@@ -56,6 +57,7 @@ export default function AddBuilding(props) {
                     <DialogContent>
                         <MyTextField name="name" label="Название" type="text" control={control}/>
                         <MyTextField name="address" label="Адрес" type="address" control={control}/>
+                        <MyTextField name="prefix" label="Префикс" type="address" control={control}/>
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" autoFocus type={"submit"}>
