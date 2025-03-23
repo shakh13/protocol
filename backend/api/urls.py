@@ -10,6 +10,7 @@ router.register('certificates', CertificateViewSet, basename='certificates')
 router.register('machines', MachineViewSet, basename='machines')
 router.register('clients', ClientViewSet, basename='clients')
 router.register('buildings', BuildingViewSet, basename='buildings')
+router.register('positions', PositionViewSet, basename='positions')
 
 urlpatterns = [
                   path('me', Me.as_view(), name='me'),

@@ -42,9 +42,10 @@ class Building(models.Model):
     id = models.AutoField(primary_key=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)
     user = models.ForeignKey("CustomUser", on_delete=models.SET_NULL, null=True, blank=True)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, related_name="buildings", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
+    prefix = models.CharField(max_length=10, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -90,7 +91,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-    laboratory = models.OneToOneField(Laboratory, on_delete=models.CASCADE)
+    laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
     clients = models.ManyToManyField(Client, blank=True)
 

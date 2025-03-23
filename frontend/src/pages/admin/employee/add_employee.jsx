@@ -12,29 +12,80 @@ import {useState, useEffect} from "react";
 import {useTheme} from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useForm} from "react-hook-form";
-
-const options = [
-    {value: 'chocolate', label: 'Chocolate'},
-    {value: 'strawberry', label: 'Strawberry'},
-    {value: 'vanilla', label: 'Vanilla'}
-]
+import AxiosInstance from "../../../components/axios_instance.jsx";
+import Waiting from "../../../components/Waiting.jsx";
+import * as yup from "yup";
+import {yupResolver} from "@hookform/resolvers/yup";
 
 export default function AddEmployee(props) {
-    const {open, setOpen} = props;
+    const {open, setOpen, updateData} = props;
+    const [positions, setPositions] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    function getData() {
+        setLoading(true);
+        AxiosInstance.get("positions/")
+            .then((response) => {
+                let pos = [];
+                response.data.map((position) => {
+                    pos.push({
+                        value: position.id,
+                        label: position.name,
+                    })
+                })
+                setPositions(pos);
+                setLoading(false);
+            })
+            .catch((error) => {
+                setLoading(true);
+                console.log(error);
+            })
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    const {control, handleSubmit, watch} = useForm({
+    const schema = yup.object({
+        first_name: yup.string().required('Введите имя').min(3, 'Минимум 3 букв'),
+        last_name: yup.string().required('Введите фамилию').min(3, 'Минимум 3 букв'),
+        email: yup.string().email('Введите правильный Email').required('Введите Email'),
+        password: yup.string()
+            .min(6, 'Пароль должен содержить минимум 6 символов')
+            .required('Введите пароль'),
+        position: yup.object().required('Выберите должность'),
+    });
+
+    const {control, handleSubmit} = useForm({
+        resolver: yupResolver(schema),
         defaultValues: {
-            name: '',
+            first_name: '',
+            last_name: '',
             email: '',
-            position: {value: 'chocolate', label: 'Chocolate'},
+            password: '',
         },
     });
 
     const onSubmit = (data) => {
-        console.log("Selected:", data);
+        AxiosInstance.post("register/", {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
+            username: data.email,
+            password: data.password,
+            position: data.position.value,
+        })
+            .then((response) => {
+                updateData();
+                window.location.href = '/admin/employee/' + response.data.id;
+            })
+            .catch((error) => {
+                console.log(error);
+                setOpen(false);
+            });
     };
     const handleClose = () => {
         setOpen(false);
@@ -53,31 +104,35 @@ export default function AddEmployee(props) {
                 flexDirection: 'column',
                 height: '100%',
             }}>
-                <DialogTitle id="responsive-dialog-title">
-                    {"Добавить сотрудника"}
-                </DialogTitle>
+                {loading
+                    ? <Waiting/>
+                    : <>
+                        <DialogTitle id="responsive-dialog-title">
+                            {"Добавить сотрудника"}
+                        </DialogTitle>
 
-                <form onSubmit={handleSubmit(onSubmit)}
-                      style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-                    <DialogContent>
-                        <MyTextField name="name" label="Полное имя" type="text" control={control}/>
-                        <MyTextField name="email" label="Email" type="email" control={control}/>
-                        <MySelectField name={"position"} label={"Должность"} options={options} control={control}/>
-                        <MyMultiSelectField name={"clients"} label={"Заказчики"} options={options}
-                                            control={control}/>
-                        <MyMultiSelectField name={"buildings"} label={"Объекты"} options={options}
-                                            control={control}/>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button variant="contained" autoFocus type={"submit"}>
-                            Сохранить
-                        </Button>
-                        <Button type={"button"} autoFocus onClick={handleClose}>
-                            Отмена
-                        </Button>
-                    </DialogActions>
+                        <form onSubmit={handleSubmit(onSubmit)}
+                              style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+                            <DialogContent>
+                                <MyTextField name="first_name" label="Имя" type="text" control={control}/>
+                                <MyTextField name="last_name" label="Фамилия" type="text" control={control}/>
+                                <MyTextField name="email" label="Email" type="email" control={control}/>
+                                <MyTextField name="password" label="Пароль" type="password" control={control}/>
 
-                </form>
+                                <MySelectField name={"position"} label={"Должность"} options={positions}
+                                               control={control}/>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="contained" autoFocus type={"submit"}>
+                                    Сохранить
+                                </Button>
+                                <Button type={"button"} autoFocus onClick={handleClose}>
+                                    Отмена
+                                </Button>
+                            </DialogActions>
+                        </form>
+                    </>
+                }
             </Container>
         </Dialog>
     );

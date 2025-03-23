@@ -2,8 +2,6 @@ import {Container} from "@mui/material";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import MyTextField from "../../../components/forms/MyTextField.jsx";
-import MySelectField from "../../../components/forms/MySelectField.jsx";
-import MyMultiSelectField from "../../../components/forms/MyMultiSelectField.jsx";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -12,15 +10,26 @@ import {useState, useEffect} from "react";
 import {useTheme} from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useForm} from "react-hook-form";
+import * as yup from "yup";
+import {yupResolver} from "@hookform/resolvers/yup";
+import AxiosInstance from "../../../components/axios_instance.jsx";
 
 
 export default function AddBuilding(props) {
-    const {open, setOpen} = props;
+    const {open, setOpen, client, updateData} = props;
+
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    const {control, handleSubmit, watch} = useForm({
+    const schema = yup.object({
+        name: yup.string().required('Введите название объекта'),
+        address: yup.string().required('Введите адрес объекта'),
+        prefix: yup.string().min(1, 'Введите не менее 1 символ').required('Введите префикс для объекта'),
+    });
+
+    const {control, handleSubmit} = useForm({
+        resolver: yupResolver(schema),
         defaultValues: {
             name: '',
             address: '',
@@ -29,7 +38,20 @@ export default function AddBuilding(props) {
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        AxiosInstance.post("buildings/", {
+            name: data.name,
+            address: data.address,
+            prefix: data.prefix,
+            client: client,
+        })
+            .then((response) => {
+                updateData();
+                setOpen(false);
+            })
+            .catch((error) => {
+                console.log(error);
+                setOpen(false);
+            });
     };
     const handleClose = () => {
         setOpen(false);

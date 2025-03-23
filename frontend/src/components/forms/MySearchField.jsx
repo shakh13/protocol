@@ -3,6 +3,7 @@ import * as React from "react";
 
 export default function MySearchField(props) {
     const {setSearchFilter, name} = props;
+
     return (
         <TextField
             id={name}

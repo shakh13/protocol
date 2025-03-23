@@ -22,6 +22,47 @@ from django.utils.html import strip_tags
 User = get_user_model()
 
 
+class PositionViewSet(viewsets.ModelViewSet):
+    serializer_class = PositionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Position.objects.filter(laboratory=user.laboratory)
+
+    def retrieve(self, request, *args, **kwargs):
+        queryset = Position.objects.all()
+        position = get_object_or_404(queryset, pk=self.kwargs['pk'])
+        serializer = self.serializer_class(position)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        request.data['laboratory'] = request.user.laboratory.id
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=201)
+
+    def update(self, request, *args, **kwargs):
+        instance = get_object_or_404(Position, pk=self.kwargs['pk'])  # Get existing position
+        serializer = self.serializer_class(instance, data=request.data, partial=True)  # Full update
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=200)
+
+    def partial_update(self, request, *args, **kwargs):
+        request.data['laboratory'] = request.user.laboratory.id
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=200)
+
+    def destroy(self, request, *args, **kwargs):
+        position = get_object_or_404(Position, pk=self.kwargs['pk'])
+        position.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class BuildingViewSet(viewsets.ModelViewSet):
     serializer_class = BuildingSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -64,6 +105,7 @@ class BuildingViewSet(viewsets.ModelViewSet):
 
 
 class ClientViewSet(viewsets.ModelViewSet):
+    queryset = Client.objects.prefetch_related("buildings").all()
     serializer_class = ClientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -186,6 +228,55 @@ class CertificateViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class UserViewSet(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = User.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data)
+
+    def list(self, request):
+        current_user = request.user
+        queryset = User.objects.filter(
+            laboratory_id=current_user.laboratory_id  # ✅ Same laboratory
+        ).exclude(id=current_user.id)  # ✅ Exclude current user
+
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        instance = get_object_or_404(CustomUser, pk=pk)  # Get existing user
+        password = request.data.pop('password', None)
+        position_id = request.data.pop('position', None)
+        if position_id:
+            try:
+                position = Position.objects.get(id=position_id)  # Fetch Position instance
+            except Position.DoesNotExist:
+                raise serializers.ValidationError({"position": "Invalid position ID."})
+        else:
+            position = None
+        serializer = self.serializer_class(instance, data=request.data, partial=True)  # Full update
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        user = User.objects.get(pk=pk)
+        user.position = position
+
+        if password:
+            user.set_password(password)
+        user.save()
+
+        return Response(serializer.data, status=200)
+
+    def destroy(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=self.kwargs['pk'])
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class Me(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = LoginSerializer
@@ -226,31 +317,15 @@ class LoginViewSet(viewsets.ViewSet):
 
 
 class RegisterViewSet(viewsets.ViewSet):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = RegisterSerializer
 
     def create(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={"request": request})  # Pass request in context
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-
-
-class UserViewSet(viewsets.ViewSet):
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = RegisterSerializer
-
-    def retrieve(self, request, pk=None):
-        queryset = User.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = self.serializer_class(user)
-        return Response(serializer.data)
-
-    def list(self, request):
-        queryset = User.objects.all()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
 
 
 @receiver(reset_password_token_created)

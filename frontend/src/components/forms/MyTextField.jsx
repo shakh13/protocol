@@ -16,7 +16,7 @@ export default function MyTextField(props) {
                     <TextField
                         key={name}
                         autoFocus
-                        required
+                        // required
                         margin="dense"
                         placeholder={label}
                         type={type}

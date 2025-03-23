@@ -6,7 +6,7 @@ import FormControl from "@mui/material/FormControl";
 import {FormHelperText} from "@mui/material";
 
 export default function MySelectField(props) {
-    const {name, control, label, options} = props;
+    const {name, control, label, options, onSelected} = props;
 
     const selectColorStyles = {
         option: (styles) => ({
@@ -34,7 +34,11 @@ export default function MySelectField(props) {
                                 fullWidth
                                 options={options}
                                 styles={selectColorStyles}
-                                onChange={onChange}
+                                onChange={(selected) => {
+                                    onChange(selected);
+                                    if (onSelected)
+                                        onSelected(selected);
+                                }}
                                 value={value}
                                 error={!!error}
                                 className="basic-multi-select selectCustom"

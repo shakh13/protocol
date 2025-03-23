@@ -12,22 +12,43 @@ import {useState, useEffect} from "react";
 import {useTheme} from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import ErrorMessage from "../../../components/ErrorMessage.jsx";
+import AxiosInstance from "../../../components/axios_instance.jsx";
 
 
 export default function AddPosition(props) {
-    const {open, setOpen} = props;
+    const {open, setOpen, updateData} = props;
+    const [addError, setAddError] = useState(false);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+    const schema = yup.object({
+        name: yup.string().required("Введите название должности"),
+    })
+
     const {control, handleSubmit, watch} = useForm({
+        resolver: yupResolver(schema),
         defaultValues: {
             name: '',
         },
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        setAddError(false);
+        AxiosInstance.post("positions/", {
+            name: data.name,
+        })
+            .then((response) => {
+                updateData();
+                setOpen(false);
+            })
+            .catch((error) => {
+                setAddError(true);
+                console.log(error);
+            });
     };
     const handleClose = () => {
         setOpen(false);
@@ -54,6 +75,7 @@ export default function AddPosition(props) {
                       style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                     <DialogContent>
                         <MyTextField name="name" label="Название" type="text" control={control}/>
+                        {addError && <ErrorMessage message={"Ошибка добавления должность"}/>}
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" autoFocus type={"submit"}>

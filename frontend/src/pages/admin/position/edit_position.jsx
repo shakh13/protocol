@@ -2,8 +2,6 @@ import {Container} from "@mui/material";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import MyTextField from "../../../components/forms/MyTextField.jsx";
-import MySelectField from "../../../components/forms/MySelectField.jsx";
-import MyMultiSelectField from "../../../components/forms/MyMultiSelectField.jsx";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -12,22 +10,60 @@ import {useState, useEffect} from "react";
 import {useTheme} from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useForm} from "react-hook-form";
+import AxiosInstance from "../../../components/axios_instance.jsx";
+import * as yup from "yup";
+import {yupResolver} from "@hookform/resolvers/yup";
 
 
 export default function EditPosition(props) {
-    const {open, setOpen, id} = props;
+    const {open, setOpen, id, updateData} = props;
+    const [loading, setLoading] = useState(true);
+    const [editError, setEditError] = useState(false);
+
+    function getData() {
+        setLoading(true);
+        AxiosInstance.get("positions/" + id + "/")
+            .then((response) => {
+                setValue("name", response.data.name);
+                setLoading(false);
+            })
+            .catch((error) => {
+                setLoading(true);
+                console.log(error);
+            });
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-    const {control, handleSubmit, watch} = useForm({
+    const schema = yup.object({
+        name: yup.string().required("Введите название должности"),
+    })
+
+    const {control, handleSubmit, setValue} = useForm({
+        resolver: yupResolver(schema),
         defaultValues: {
             name: '',
         },
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        setEditError(false);
+        AxiosInstance.put("positions/" + id + "/", {
+            name: data.name,
+        })
+            .then((response) => {
+                updateData();
+                setOpen(false);
+            })
+            .catch((error) => {
+                setEditError(true);
+                console.log(error);
+            });
     };
     const handleClose = () => {
         setOpen(false);

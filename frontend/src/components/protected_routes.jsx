@@ -1,5 +1,4 @@
 import {Outlet, Navigate} from "react-router-dom";
-import AxiosInstance from "./axios_instance.jsx";
 
 const ProtectedAdminRoute = () => {
     let token = localStorage.getItem("token");
@@ -7,8 +6,8 @@ const ProtectedAdminRoute = () => {
 
     return (
         token
-            ? (isAdmin ? <Outlet/> : <Navigate to='/protocols'/>)
-            : <Navigate to={'/'}/>
+            ? (isAdmin ? <Outlet/> : window.location.href = '/protocols')
+            : window.location.href = '/'
     );
 }
 
@@ -17,8 +16,8 @@ const ProtectedPersonalRoute = () => {
     let isAdmin = localStorage.getItem("isAdmin") === 'true';
 
     return (
-        isAdmin === true ? <Navigate to={"/admin"}/> :
-            token ? <Outlet/> : <Navigate to="/"/>
+        isAdmin === true ? window.location.href = '/admin' :
+            token ? <Outlet/> : window.location.href = '/'
     );
 }
 

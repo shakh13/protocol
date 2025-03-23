@@ -40,15 +40,18 @@ export default function LoginPage() {
     const [showMessage, setShowMessage] = React.useState(false);
 
     const checkLogin = () => {
-        AxiosInstance.get('me').then((response) => {
-            localStorage.setItem('fullname', response.data.fullname);
-            if (response.data.isAdmin) {
-                localStorage.setItem('isAdmin', true);
-            }
-            window.location.href = response.data.isAdmin ? '/admin' : '/protocols';
-        }).catch((error) => {
-            // localStorage.clear();
-        });
+        const token = localStorage.getItem('token');
+        if (token) {
+            AxiosInstance.get('me').then((response) => {
+                localStorage.setItem('fullname', response.data.fullname);
+                if (response.data.isAdmin) {
+                    localStorage.setItem('isAdmin', true);
+                }
+                window.location.href = response.data.isAdmin ? '/admin' : '/protocols';
+            }).catch((error) => {
+                localStorage.clear();
+            });
+        }
     }
 
     useEffect(() => {
@@ -102,6 +105,7 @@ export default function LoginPage() {
                 }
                 window.location.href = response.data.isAdmin ? "/admin" : "/protocols";
             }).catch((error) => {
+                console.log(error);
                 setShowMessage(true);
                 localStorage.clear();
             });
@@ -167,10 +171,11 @@ export default function LoginPage() {
                         />
                     </FormControl>
                     {showMessage &&
-                        <Box sx={{color: "red", width: "100%", textAlign: "center", fontSize: 14}}>Email или пароль
-                            неправильно</Box>}
+                        <Box sx={{color: "red", width: "100%", textAlign: "center", fontSize: 14}}>
+                            Email или пароль неверно
+                        </Box>}
                     <Button
-                        type="submit"
+                        // type="submit"
                         fullWidth
                         variant="contained"
                         onClick={validateInputs}
