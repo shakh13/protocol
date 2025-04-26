@@ -46,7 +46,10 @@ export default function EditMachine(props) {
         AxiosInstance.get("machines/" + id)
             .then((response) => {
                 setValue('name', response.data.name);
-                setValue('certificate', certs.find((certificate) => certificate.value === response.data.certificate));
+                setValue('certificate', {
+                    value: response.data.certificate.id,
+                    label: response.data.certificate.name,
+                });
                 setValue('certificate_number', response.data.certificate_number);
                 setValue('certificate_expiry', dayjs(response.data.certificate_expiry_date).format('MM/DD/YYYY'));
                 setLoading(false);
@@ -123,7 +126,7 @@ export default function EditMachine(props) {
                         :
                         <>
                             <DialogTitle id="responsive-dialog-title">
-                                {"Редактировать сотрудника"}
+                                {"Редактировать оборудование"}
                             </DialogTitle>
 
                             <form onSubmit={handleSubmit(onSubmit)}

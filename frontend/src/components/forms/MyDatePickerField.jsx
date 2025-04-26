@@ -18,6 +18,7 @@ export default function MyDatePickerField(props) {
                              fieldState: {error}
                          }) => (
                     <DatePicker
+                        label={label}
                         required
                         placeholder={label}
                         sx={{width: '100%', marginY: '7px'}}

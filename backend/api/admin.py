@@ -9,3 +9,6 @@ admin.site.register(Machines)
 admin.site.register(Certificate)
 
 admin.site.register(CustomUser)
+
+admin.site.register(ProtocolType)
+admin.site.register(Protocol)

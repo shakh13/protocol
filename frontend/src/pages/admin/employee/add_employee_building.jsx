@@ -27,15 +27,14 @@ export default function AddEmployeeBuilding(props) {
         setClientsLoading(true);
         AxiosInstance.get("clients/")
             .then((response) => {
-                setClients([]);
+                let c = [];
                 response.data.map((client) => {
-                    setClients([
-                        ...clients,
-                        {
-                            value: client.id,
-                            label: client.name,
-                        }]);
-                })
+                    c.push({
+                        value: client.id,
+                        label: client.name,
+                    });
+                });
+                setClients(c);
 
                 setClientsLoading(false);
             })
@@ -64,6 +63,23 @@ export default function AddEmployeeBuilding(props) {
 
     const onSubmit = (data) => {
         console.log(data);
+        AxiosInstance.post("users/" + employee + "/add_client/", {
+            client_id: data.client.value
+        })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        AxiosInstance.put("buildings/" + data.building.value + "/", {
+            user: employee,
+        })
+            .then((response) => {
+                updateData();
+                setOpen(false);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     const onClientSelected = (selected) => {
@@ -71,16 +87,17 @@ export default function AddEmployeeBuilding(props) {
         AxiosInstance.get("clients/" + selected.value + "/")
             .then((response) => {
                 setBuildingLoading(false);
+
                 let b = [];
                 response.data.buildings.map((building) => {
-                    console.log(building);
                     if (building.user === null) {
                         b.push({
                             value: building.id,
                             label: building.name,
                         });
                     }
-                })
+                });
+
                 setBuildings(b);
             })
             .catch((error) => {
@@ -88,7 +105,6 @@ export default function AddEmployeeBuilding(props) {
                 setBuildingLoading(false);
                 console.log(error);
             });
-
     }
 
     const handleClose = () => {

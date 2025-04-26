@@ -1,13 +1,15 @@
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
-export default function NoData() {
+export default function NoData(props) {
+    const {message = "Нет данных"} = props;
     return (
         <Box sx={{
             width: '100%',
             padding: '10px',
             textAlign: 'center',
         }}>
-            Нет данных
+            <Typography variant={"body2"} color={"textSecondary"}>{message}</Typography>
         </Box>
     );
 }

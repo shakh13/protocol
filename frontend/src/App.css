@@ -1,2 +1,11 @@
 #root {
 }
+
+.pdf-container {
+    width: 100%;
+    height: 900px;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

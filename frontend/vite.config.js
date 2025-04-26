@@ -9,4 +9,7 @@ export default defineConfig({
         port: 80,
         cors: {origin: "*"},
     },
+    optimizeDeps: {
+        include: ['react-to-pdf'],
+    }
 })

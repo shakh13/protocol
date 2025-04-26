@@ -63,8 +63,13 @@ export default function AdminClients() {
             <Box sx={{
                 display: 'flex',
             }}>
-                <Typography variant="h6" component="div"
-                            sx={{padding: '0 10px', marginY: 'auto'}}>Заказчики</Typography>
+                <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{padding: '0 10px', marginY: 'auto'}}
+                >
+                    Заказчики
+                </Typography>
                 <Tooltip title="Добавить">
                     <IconButton
                         variant="outlined"

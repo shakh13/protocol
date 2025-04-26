@@ -123,9 +123,8 @@ export default function AdminMachines() {
                                               }
                                     >
                                         <ListItemText
-                                            primary={(<Link href={"/admin/machine/" + machine.id} underline="none">
-                                                {machine.name}</Link>)}
-                                            secondary={machine.certificate_number + " - " + dayjs(machine.certificate_expiry_date).format("DD.MM.YYYY")}
+                                            primary={machine.name}
+                                            secondary={machine.certificate.name + ": " + machine.certificate_number + " - " + dayjs(machine.certificate_expiry_date).format("DD.MM.YYYY")}
                                         />
 
                                         <Divider variant="inset" component="div"/>

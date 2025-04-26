@@ -1,4 +1,4 @@
-import {Controller} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import Box from "@mui/material/Box";
 import Select from "react-select";
 import * as React from "react";
@@ -14,12 +14,26 @@ export default function MySelectField(props) {
             backgroundColor: 'white',
             color: 'black',
         }),
+        menu: (styles) => ({
+            ...styles,
+            // height: 400, // Set max height of the dropdown
+            // overflowY: "auto", // Enable scrolling if options exceed height
+            zIndex: 99999,
+        }),
+        // menuList: (styles) => ({
+        //     ...styles,
+        //     height: 300, // Set max height of the option list
+        //     overflowY: "auto", // Enable scrolling
+        //     backgroundColor: 'white',
+        // }),
     }
+
 
     return (
         <Controller
             name={name}
             control={control}
+            defaultValue={null}
             render={
                 ({
                      field: {onChange, value},
@@ -30,6 +44,9 @@ export default function MySelectField(props) {
                         <FormControl sx={{width: '100%'}}>
                             <Box sx={{height: '10px'}}/>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                label={label}
                                 placeholder={label}
                                 fullWidth
                                 options={options}
@@ -41,8 +58,6 @@ export default function MySelectField(props) {
                                 }}
                                 value={value}
                                 error={!!error}
-                                className="basic-multi-select selectCustom"
-                                classNamePrefix="select"
                             />
                             <FormHelperText error={!!error}>{error?.message}</FormHelperText>
                         </FormControl>

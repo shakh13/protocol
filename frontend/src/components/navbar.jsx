@@ -15,7 +15,7 @@ import AxiosInstance from "./axios_instance.jsx";
 const admin_navigation = [
     {
         segment: 'admin/',
-        title: 'Запросы на редактирование',
+        title: 'Запросы',
         icon: <Task/>,
         badge: "2",
     },
@@ -70,7 +70,7 @@ const admin_navigation = [
 
 const personal_navigation = [
     {
-        segment: 'customers/',
+        segment: 'clients/',
         title: 'Заказчики',
         icon: <PersonIcon/>,
     },
