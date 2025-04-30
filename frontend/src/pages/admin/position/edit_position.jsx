@@ -25,6 +25,7 @@ export default function EditPosition(props) {
         AxiosInstance.get("positions/" + id + "/")
             .then((response) => {
                 setValue("name", response.data.name);
+                setValue('name_en', response.data.name_en);
                 setLoading(false);
             })
             .catch((error) => {
@@ -42,12 +43,14 @@ export default function EditPosition(props) {
 
     const schema = yup.object({
         name: yup.string().required("Введите название должности"),
+        name_en: yup.string().required("Enter job title"),
     })
 
     const {control, handleSubmit, setValue} = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             name: '',
+            name_en: '',
         },
     });
 
@@ -55,6 +58,7 @@ export default function EditPosition(props) {
         setEditError(false);
         AxiosInstance.put("positions/" + id + "/", {
             name: data.name,
+            name_en: data.name_en,
         })
             .then((response) => {
                 updateData();
@@ -89,7 +93,8 @@ export default function EditPosition(props) {
                 <form onSubmit={handleSubmit(onSubmit)}
                       style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                     <DialogContent>
-                        <MyTextField name="name" label="Название" type="text" control={control}/>
+                        <MyTextField name="name" label="Должность" type="text" control={control}/>
+                        <MyTextField name="name_en" label="Job title" type="text" control={control}/>
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" autoFocus type={"submit"}>

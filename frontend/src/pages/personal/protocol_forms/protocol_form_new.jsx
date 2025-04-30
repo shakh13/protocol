@@ -6,8 +6,8 @@ import MyTextField from "../../../components/forms/MyTextField.jsx";
 import MyTextareaField from "../../../components/forms/MyTextareaField.jsx";
 import {useEffect, useState} from "react";
 
-export default function ProtocolForm(props) {
-    const {control, settings} = props;
+export default function ProtocolFormNew(props) {
+    const {control, settings, language} = props;
 
     return (
         <Box sx={{marginTop: "15px"}}>

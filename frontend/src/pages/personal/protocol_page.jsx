@@ -27,7 +27,6 @@ export default function ProtocolPage() {
         setLoading(true);
         AxiosInstance.get("protocol/" + id)
             .then((response) => {
-                console.log(response.data);
                 setProtocol(response.data);
             })
             .catch((error) => {
@@ -78,7 +77,7 @@ export default function ProtocolPage() {
                                     <IconButton
                                         component={Link}
                                         variant={"text"}
-                                        href={"/protocol-pdf"}
+                                        href={"/protocol-pdf/" + id}
                                         underline="none"
                                     >
                                         <CloudDownloadIcon/>

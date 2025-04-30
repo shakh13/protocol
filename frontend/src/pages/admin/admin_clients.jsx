@@ -137,7 +137,6 @@ export default function AdminClients() {
                                                         {client.name}
                                                     </Link>
                                                 )}
-                                                secondary={client.address}
                                             />
 
                                             <Divider/>

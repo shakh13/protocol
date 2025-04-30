@@ -18,7 +18,7 @@ def generate(pdf, settings, data):
         for d in table_data:
             row = table.row()
             align = "C"  # heading is center, others are left
-
+            print(len(d))
             for i in range(0, len(d)):
                 if r > 0:
                     row.cell(f'{r}' if settings["fields"][r - 1][i]["type"] == "i" else d[i], align=align)

@@ -46,7 +46,8 @@ class PositionSerializer(serializers.ModelSerializer):
 class BuildingSerializer(serializers.ModelSerializer):
     laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
     client = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
 
     class Meta:
         model = Building
@@ -90,7 +91,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_buildings(self, obj):
         buildings = Building.objects.filter(user=obj)  # Get buildings where user is assigned
-        return [{"id": b.id, "name": b.name, "address": b.address} for b in buildings]
+        return [{"id": b.id, "name": b.name} for b in buildings]
 
 
 class CertificateSerializer(serializers.ModelSerializer):
@@ -171,7 +172,13 @@ class ProtocolTypeSerializer(serializers.ModelSerializer):
 
 
 class ProtocolSerializer(serializers.ModelSerializer):
-    laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+    # laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+    laboratory = LaboratorySerializer(read_only=True)
+    laboratory_id = serializers.PrimaryKeyRelatedField(
+        queryset=Laboratory.objects.all(),
+        source='laboratory', write_only=True
+    )
+
     # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     user = UserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(

@@ -204,7 +204,6 @@ export default function AdminClient() {
                                                             {building.name}
                                                         </Link>
                                                     )}
-                                                    secondary={building.address}
                                                 />
                                                 <Divider variant="inset" component="div"/>
                                             </ListItem>

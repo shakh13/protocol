@@ -35,64 +35,72 @@ export default function ViewProtocol(props) {
                 </Grid>
                 <Grid size={8}>
                     {protocol.product_name}
-                    <br/>
-                    {protocol.product_name_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.product_name_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     Обозначение и данные маркировки объекта испытаний
                 </Grid>
                 <Grid size={8}>
                     {protocol.building_data}
-                    <br/>
-                    {protocol.building_data_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.building_data_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     Наименование изготовителя
                 </Grid>
                 <Grid size={8}>
                     {protocol.producer_name}
-                    <br/>
-                    {protocol.producer_name_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.product_name_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     Вид испытания
                 </Grid>
                 <Grid size={8}>
                     {protocol.test_type}
-                    <br/>
-                    {protocol.test_type_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.test_type_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     НД на объекты испытаний
                 </Grid>
                 <Grid size={8}>
                     {protocol.rd_test_building}
-                    <br/>
-                    {protocol.rd_test_building_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.rd_test_building_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     НД на методы испытаний
                 </Grid>
                 <Grid size={8}>
                     {protocol.rd_test_method}
-                    <br/>
-                    {protocol.rd_test_method_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.rd_test_method_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     Дополнения, отклонения или исключения из метода
                 </Grid>
                 <Grid size={8}>
                     {protocol.addition}
-                    <br/>
-                    {protocol.addition_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.addition_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     Испытания, проведенные субподрядчиком
                 </Grid>
                 <Grid size={8}>
                     {protocol.subcontractor}
-                    <br/>
-                    {protocol.subcontractor_eng}
+                    {protocol.language === 'en' &&
+                        `<br/>${protocol.subcontractor_eng}`
+                    }
                 </Grid>
                 <Grid size={4}>
                     Дата начала испытания
@@ -135,14 +143,14 @@ export default function ViewProtocol(props) {
                     color: "#888",
                 }}
             >
-                <Grid size={5}>
-                    Температура / Temperature
+                <Grid size={5} color={'CaptionText'} bgcolor={'ButtonShadow'}>
+                    Температура
                 </Grid>
                 <Grid size={7}>
                     {protocol.temperature_from} - {protocol.temperature_to} °С
                 </Grid>
-                <Grid size={5}>
-                    Относительная влажность / Relative humidity
+                <Grid size={5} color={'CaptionText'} bgcolor={'ButtonShadow'}>
+                    Относительная влажность
                 </Grid>
                 <Grid size={7}>
                     {protocol.humidity_from} - {protocol.humidity_to} %

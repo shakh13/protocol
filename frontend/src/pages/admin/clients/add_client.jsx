@@ -26,14 +26,12 @@ export default function AddClient(props) {
     const schema = yup
         .object({
             name: yup.string().required('Введите название заказчика'),
-            address: yup.string().required('Введите адрем'),
         });
 
     const {control, handleSubmit} = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             name: '',
-            address: '',
         },
     });
 
@@ -41,7 +39,6 @@ export default function AddClient(props) {
         setAddError(false);
         AxiosInstance.post("clients/", {
             name: data.name,
-            address: data.address,
         }).then((response) => {
             updateData();
             setOpen(false);
@@ -75,7 +72,6 @@ export default function AddClient(props) {
                       style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                     <DialogContent>
                         <MyTextField name="name" label="Название" type="text" control={control}/>
-                        <MyTextField name="address" label="Адрес" type="address" control={control}/>
                         {addError && <ErrorMessage message={"Ошибка добавления клиента"}/>}
                     </DialogContent>
                     <DialogActions>

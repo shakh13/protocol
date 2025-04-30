@@ -32,7 +32,6 @@ export default function EditClient(props) {
         AxiosInstance.get("clients/" + id + "/")
             .then((response) => {
                 setValue('name', response.data.name);
-                setValue('address', response.data.address);
                 setLoading(false);
             })
             .catch((error) => {
@@ -48,14 +47,12 @@ export default function EditClient(props) {
     const schema = yup
         .object({
             name: yup.string().required('Введите название заказчика'),
-            address: yup.string().required('Введите адрес'),
         });
 
     const {control, handleSubmit, setValue} = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             name: '',
-            address: '',
         },
     });
 
@@ -63,7 +60,6 @@ export default function EditClient(props) {
         setEditError(false);
         AxiosInstance.put("clients/" + id + "/", {
             name: data.name,
-            address: data.address,
         })
             .then((response) => {
                 updateData();
@@ -99,7 +95,6 @@ export default function EditClient(props) {
                       style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                     <DialogContent>
                         <MyTextField name="name" label="Название" type="text" control={control}/>
-                        <MyTextField name="address" label="Адрес" type="text" control={control}/>
                         {editError &&
                             <ErrorMessage message={"Ошибка редактирования"}/>
                         }

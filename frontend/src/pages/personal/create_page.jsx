@@ -18,6 +18,7 @@ import {Add, Delete} from "@mui/icons-material";
 import NoData from "../../components/NoData.jsx";
 import ProtocolForm from "./protocol_forms/protocol_form.jsx";
 import dayjs from "dayjs";
+import ProtocolFormNew from "./protocol_forms/protocol_form_new.jsx";
 
 
 export default function CreatePage() {
@@ -26,6 +27,7 @@ export default function CreatePage() {
     const [clients, setClients] = React.useState([]);
     const [buildings, setBuildings] = React.useState([]);
     const [selectedBuilding, setSelectedBuilding] = React.useState(null);
+    const [selectedLang, setSelectedLang] = React.useState('ru');
     const [selectedClient, setSelectedClient] = React.useState(null);
     const [selectedProtocol, setSelectedProtocol] = React.useState(null);
 
@@ -98,7 +100,31 @@ export default function CreatePage() {
         getData();
     }, []);
 
-    const getValidationSchema = (fields) => {
+    const validationSchemeRu = (fields) => {
+        return yup.object().shape({
+            client: yup.object().required('Выберите заказчика'),
+            protocol_type: yup.object().required('Выберите протокол'),
+            product_name: yup.string().required('Заполните поля'),
+            building_data: yup.string().required('Заполните поля'),
+            producer_name: yup.string().required('Заполните поля'),
+            test_type: yup.string().required('Заполните поля'),
+            rd_test_building: yup.string().required('Заполните поля'),
+            rd_test_method: yup.string().required('Заполните поля'),
+            addition: yup.string().required('Заполните поля'),
+            subcontractor: yup.string().required('Заполните поля'),
+            start_date: yup.date().required('Выберите дата начала испытания'),
+            end_date: yup.date().required('Выберите дата завершения испытания'),
+            temperature_from: yup.number().required('Заполните поля'),
+            temperature_to: yup.number().required('Заполните поля'),
+            humidity_from: yup.number().required('Заполните поля'),
+            humidity_to: yup.number().required('Заполните поля'),
+            machines: yup.array().of(yup.object().shape({
+                value: yup.object().required("Выберите прибор"),
+            })),
+        });
+    }
+
+    const validationSchemeEn = (fields) => {
         return yup.object().shape({
             client: yup.object().required('Выберите заказчика'),
             protocol_type: yup.object().required('Выберите протокол'),
@@ -132,7 +158,7 @@ export default function CreatePage() {
 
     const {control, handleSubmit, setValue} = useForm(
         {
-            resolver: yupResolver(getValidationSchema([])),
+            resolver: yupResolver(selectedLang === 'ru' ? validationSchemeRu([]) : validationSchemeEn([])),
             defaultValues: {
                 machines: [],
             }
@@ -145,20 +171,26 @@ export default function CreatePage() {
         name: "machines",
     });
 
+    const {fields: dataFields, append: dataAppend, remove: dataRemove} = useFieldArray({
+        control,
+        name: "data",
+    })
+
     const onSubmit = (data) => {
         // console.log(data, selectedProtocol);
         let protocol = {};
-        selectedProtocol.settings['fields'].map((field) => {
-            field.map((col) => {
-                if (col['type'] !== 'i' && col['type'] !== 'text') {
-                    if (col['type'] === 'date_field') {
-                        protocol[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
-                    } else {
-                        protocol[col.name] = data[col.name]
+        if (!selectedProtocol.settings.isEmpty)
+            selectedProtocol.settings['fields'].map((field) => {
+                field.map((col) => {
+                    if (col['type'] !== 'i' && col['type'] !== 'text') {
+                        if (col['type'] === 'date_field') {
+                            protocol[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
+                        } else {
+                            protocol[col.name] = data[col.name]
+                        }
                     }
-                }
+                });
             });
-        });
 
 
         let m = [];
@@ -254,6 +286,20 @@ export default function CreatePage() {
                                 control={control}
                             />
                             <MySelectField
+                                name="language"
+                                label="Язык"
+                                options={[
+                                    {value: 'ru', label: 'Русский'},
+                                    {value: 'en', label: 'Английский'},
+                                ]}
+                                onSelected={
+                                    (lang) => {
+                                        setSelectedLang(lang.value);
+                                    }
+                                }
+                                control={control}
+                            />
+                            <MySelectField
                                 name="protocol_type"
                                 label="Протокол"
                                 options={protocolTypes}
@@ -275,7 +321,6 @@ export default function CreatePage() {
                                         </Typography>
 
                                         <Grid container spacing={2} marginY={2}>
-
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
                                                     name={"product_name"}
@@ -283,13 +328,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"product_name_eng"}
-                                                    label={"Product name"}
-                                                    control={control}
-                                                />
-                                            </Grid>
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"product_name_eng"}
+                                                        label={"Product name"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
 
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
@@ -298,13 +345,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"building_data_eng"}
-                                                    label={"Designation and marking data of the test object"}
-                                                    control={control}
-                                                />
-                                            </Grid>
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"building_data_eng"}
+                                                        label={"Designation and marking data of the test object"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
 
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
@@ -313,14 +362,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"producer_name_eng"}
-                                                    label={"Manufacturer’s name"}
-                                                    control={control}
-                                                />
-                                            </Grid>
-
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"producer_name_eng"}
+                                                        label={"Manufacturer’s name"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
                                                     name={"test_type"}
@@ -328,14 +378,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"test_type_eng"}
-                                                    label={"Type of test"}
-                                                    control={control}
-                                                />
-                                            </Grid>
-
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"test_type_eng"}
+                                                        label={"Type of test"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
                                                     name={"rd_test_building"}
@@ -343,14 +394,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"rd_test_building_eng"}
-                                                    label={"RD on test object"}
-                                                    control={control}
-                                                />
-                                            </Grid>
-
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"rd_test_building_eng"}
+                                                        label={"RD on test object"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
                                                     name={"rd_test_method"}
@@ -358,14 +410,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"rd_test_method_eng"}
-                                                    label={"RD on test methods"}
-                                                    control={control}
-                                                />
-                                            </Grid>
-
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"rd_test_method_eng"}
+                                                        label={"RD on test methods"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
                                                     name={"addition"}
@@ -373,14 +426,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"addition_eng"}
-                                                    label={"Additions, deviations or exceptions to the method"}
-                                                    control={control}
-                                                />
-                                            </Grid>
-
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"addition_eng"}
+                                                        label={"Additions, deviations or exceptions to the method"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyTextField
                                                     name={"subcontractor"}
@@ -388,14 +442,15 @@ export default function CreatePage() {
                                                     control={control}
                                                 />
                                             </Grid>
-                                            <Grid size={{md: 6, xs: 12}}>
-                                                <MyTextField
-                                                    name={"subcontractor_eng"}
-                                                    label={"Tests carried out by subcontractor"}
-                                                    control={control}
-                                                />
-                                            </Grid>
-
+                                            {selectedLang === 'en' &&
+                                                <Grid size={{md: 6, xs: 12}}>
+                                                    <MyTextField
+                                                        name={"subcontractor_eng"}
+                                                        label={"Tests carried out by subcontractor"}
+                                                        control={control}
+                                                    />
+                                                </Grid>
+                                            }
                                             <Grid size={{md: 6, xs: 12}}>
                                                 <MyDatePickerField
                                                     name={"start_date"}
@@ -473,6 +528,7 @@ export default function CreatePage() {
                                                     <MyTextField
                                                         name={"temperature_from"}
                                                         label="Температура от"
+                                                        defaultValue={20}
                                                         type="number"
                                                         adornment={"°С"}
                                                         control={control}
@@ -482,6 +538,7 @@ export default function CreatePage() {
                                                     <MyTextField
                                                         name={"temperature_to"}
                                                         label="Температура до"
+                                                        defaultValue={22}
                                                         type="number"
                                                         adornment={"°С"}
                                                         control={control}
@@ -491,6 +548,7 @@ export default function CreatePage() {
                                                     <MyTextField
                                                         name={"humidity_from"}
                                                         label="Влажность от"
+                                                        defaultValue={50}
                                                         type="number"
                                                         adornment={"%"}
                                                         control={control}
@@ -500,6 +558,7 @@ export default function CreatePage() {
                                                     <MyTextField
                                                         name={"humidity_to"}
                                                         label="Влажность до"
+                                                        defaultValue={55}
                                                         type="number"
                                                         adornment={"%"}
                                                         control={control}
@@ -509,7 +568,13 @@ export default function CreatePage() {
                                         </Box>
 
                                         <Box>
-                                            <ProtocolForm control={control} settings={selectedProtocol.settings}/>
+                                            {"headers" in selectedProtocol.settings &&
+                                                <ProtocolFormNew
+                                                    control={control}
+                                                    settings={selectedProtocol.settings}
+                                                    language={selectedLang}
+                                                />
+                                            }
                                         </Box>
 
                                         <Box sx={{marginY: 2}}>

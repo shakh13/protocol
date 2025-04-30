@@ -118,17 +118,18 @@ export default function EditProtocol(props) {
     const onSubmit = (data) => {
         let d = {};
         const settings = JSON.parse(protocol.type.settings)
-        settings['fields'].map((field) => {
-            field.map((col) => {
-                if (col['type'] !== 'i' && col['type'] !== 'text') {
-                    if (col['type'] === 'date_field') {
-                        d[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
-                    } else {
-                        d[col.name] = data[col.name]
+        if (!settings.isEmpty)
+            settings['fields'].map((field) => {
+                field.map((col) => {
+                    if (col['type'] !== 'i' && col['type'] !== 'text') {
+                        if (col['type'] === 'date_field') {
+                            d[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
+                        } else {
+                            d[col.name] = data[col.name]
+                        }
                     }
-                }
+                });
             });
-        });
 
         let m = [];
         data.machines.map((machine) => {

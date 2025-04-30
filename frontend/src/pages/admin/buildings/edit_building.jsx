@@ -27,7 +27,6 @@ export default function EditBuilding(props) {
         AxiosInstance.get("buildings/" + id + "/")
             .then((response) => {
                 setValue('name', response.data.name);
-                setValue('address', response.data.address);
                 setValue('prefix', response.data.prefix);
                 setLoading(false);
             })
@@ -46,7 +45,6 @@ export default function EditBuilding(props) {
 
     const schema = yup.object({
         name: yup.string().required('Введите название объекта'),
-        address: yup.string().required('Введите адрес объекта'),
         prefix: yup.string().min(1, 'Введите не менее 1 символ').required('Введите префикс для объекта'),
     });
 
@@ -54,7 +52,6 @@ export default function EditBuilding(props) {
         resolver: yupResolver(schema),
         defaultValues: {
             name: '',
-            address: '',
             prefix: '',
         },
     });
@@ -62,7 +59,6 @@ export default function EditBuilding(props) {
     const onSubmit = (data) => {
         AxiosInstance.put("buildings/" + id + "/", {
             name: data.name,
-            address: data.address,
             prefix: data.prefix,
         })
             .then((response) => {
@@ -103,7 +99,6 @@ export default function EditBuilding(props) {
                                   style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                                 <DialogContent>
                                     <MyTextField name="name" label="Название" type="text" control={control}/>
-                                    <MyTextField name="address" label="Адрес" type="address" control={control}/>
                                     <MyTextField name="prefix" label="Префикс" type="address" control={control}/>
                                 </DialogContent>
                                 <DialogActions>

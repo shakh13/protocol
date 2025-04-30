@@ -27,12 +27,14 @@ export default function AddPosition(props) {
 
     const schema = yup.object({
         name: yup.string().required("Введите название должности"),
+        name_en: yup.string().required("Enter job title"),
     })
 
     const {control, handleSubmit, watch} = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             name: '',
+            name_en: '',
         },
     });
 
@@ -40,6 +42,7 @@ export default function AddPosition(props) {
         setAddError(false);
         AxiosInstance.post("positions/", {
             name: data.name,
+            name_en: data.name_en,
         })
             .then((response) => {
                 updateData();
@@ -74,7 +77,8 @@ export default function AddPosition(props) {
                 <form onSubmit={handleSubmit(onSubmit)}
                       style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                     <DialogContent>
-                        <MyTextField name="name" label="Название" type="text" control={control}/>
+                        <MyTextField name="name" label="Должность" type="text" control={control}/>
+                        <MyTextField name="name_en" label="Job title" type="text" control={control}/>
                         {addError && <ErrorMessage message={"Ошибка добавления должность"}/>}
                     </DialogContent>
                     <DialogActions>

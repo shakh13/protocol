@@ -1,0 +1,65 @@
+{
+  "col_widths": [
+    10,
+    40,
+    20,
+    25,
+    27,
+    25,
+    20,
+    23
+  ],
+  "headers": [
+    "№",
+    "Наименование продукции",
+    "Проект. класс бетона\nВнорм, MPa",
+    "Дата бетонирования",
+    "Дата испытания, сут.",
+    "Фактический класс прочности бетона\nВф, МPa",
+    "Набрал в % от проектного класса",
+    "Выводы"
+  ],
+  "headers_en": [
+    "№",
+    "Наименование продукции\nProduct name",
+    "Проект. класс бетона\nProject class of concrete\nВнорм, MPa",
+    "Дата бетонирования\nDate of concreting",
+    "Дата испытания, сут.\nDate of test, day",
+    "Фактический класс прочности бетона\nActual strength class of concrete\nВф, МPa",
+    "Набрал в % от проектного класса\nScored in % of the project class",
+    "Выводы\nConclusions"
+  ],
+  "fields": [
+    {
+      "type": "i"
+    },
+    {
+      "type": "text_field",
+      "name": "product_name"
+    },
+    {
+      "type": "text_field",
+      "name": "concrete_class"
+    },
+    {
+      "type": "date_field",
+      "name": "date"
+    },
+    {
+      "type": "date_field",
+      "name": "test_day"
+    },
+    {
+      "type": "text_field",
+      "name": "strength_class"
+    },
+    {
+      "type": "number_field",
+      "name": "class_percent"
+    },
+    {
+      "type": "text_field",
+      "name": "conclusion"
+    }
+  ]
+}

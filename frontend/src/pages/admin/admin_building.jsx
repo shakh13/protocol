@@ -49,9 +49,6 @@ export default function AdminBuilding() {
                             Объект: {building.name}
                         </Typography>
                         <Typography variant="body1" component="div" color={"textSecondary"}>
-                            Адрес: {building.address}
-                        </Typography>
-                        <Typography variant="body1" component="div" color={"textSecondary"}>
                             Протокол: {building.prefix}
                         </Typography>
 

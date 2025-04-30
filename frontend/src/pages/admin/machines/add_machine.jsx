@@ -58,7 +58,7 @@ export default function AddMachine(props) {
             name: yup.string().required('Заполните название оборудования'),
             certificate: yup.object().required('Выберите сертификата'),
             certificate_number: yup.string().required('Заполните номер сертификата'),
-            certificate_expiry: yup.date().required('Выберите срок сертификата'),
+            certificate_expiry: yup.date().required('Выберите дата выдачи'),
         });
 
     const {control, handleSubmit} = useForm({
@@ -126,7 +126,7 @@ export default function AddMachine(props) {
                                                    control={control}/>
                                     <MyTextField name={"certificate_number"} label={"Номер сертификата"} type="text"
                                                  control={control}/>
-                                    <MyDatePickerField name={"certificate_expiry"} label={"Срок сертификата"}
+                                    <MyDatePickerField name={"certificate_expiry"} label={"Дата выдачи"}
                                                        control={control}/>
                                     {addError && <ErrorMessage message={"Ошибка добавления оборудования"}/>}
                                 </DialogContent>

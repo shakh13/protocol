@@ -29,90 +29,93 @@ export default function ProtocolView(props) {
         <Box>
             {loading
                 ? <Waiting/>
-                : <Box sx={{marginTop: "15px"}}>
-                    <Typography
-                        variant="body1"
-                        component="div"
-                        sx={{marginY: 'auto'}}
-                    >
-                        Результаты испытаний
-                    </Typography>
+                : "headers" in settings
+                    ? <Box sx={{marginTop: "15px"}}>
+                        <Typography
+                            variant="body1"
+                            component="div"
+                            sx={{marginY: 'auto'}}
+                        >
+                            Результаты испытаний
+                        </Typography>
 
-                    <Grid
-                        container
-                        sx={{
-                            marginTop: "15px",
-                            marginBottom: 2,
-                            minWidth: "720px",
-                            '--Grid-borderWidth': '1px',
-                            borderTop: 'var(--Grid-borderWidth) solid',
-                            borderLeft: 'var(--Grid-borderWidth) solid',
-                            borderColor: 'divider',
-                            wordWrap: 'break-word',
-                            '& > div': {
-                                borderRight: 'var(--Grid-borderWidth) solid',
-                                borderBottom: 'var(--Grid-borderWidth) solid',
+                        <Grid
+                            container
+                            sx={{
+                                marginTop: "15px",
+                                marginBottom: 2,
+                                minWidth: "720px",
+                                '--Grid-borderWidth': '1px',
+                                borderTop: 'var(--Grid-borderWidth) solid',
+                                borderLeft: 'var(--Grid-borderWidth) solid',
                                 borderColor: 'divider',
-                            },
-                        }}
-                        columns={{xs: 190, sm: 190, md: 190, lg: 190, xl: 190}}
-                    >
-                        {
-                            settings.headers.map((header, i) => {
-                                    return (
-                                        <Grid
-                                            key={"protocol_table_" + i}
-                                            size={settings.col_widths[i]}
-                                            padding={1}
-                                            textAlign='center'
-                                            alignContent="center"
-                                        >
-                                            {header}
-                                        </Grid>
-                                    )
-                                }
-                            )
-                        }
+                                wordWrap: 'break-word',
+                                '& > div': {
+                                    borderRight: 'var(--Grid-borderWidth) solid',
+                                    borderBottom: 'var(--Grid-borderWidth) solid',
+                                    borderColor: 'divider',
+                                },
+                            }}
+                            columns={{xs: 190, sm: 190, md: 190, lg: 190, xl: 190}}
+                        >
+                            {
+                                settings.headers.map((header, i) => {
+                                        return (
+                                            <Grid
+                                                key={"protocol_table_" + i}
+                                                size={settings.col_widths[i]}
+                                                padding={1}
+                                                textAlign='center'
+                                                alignContent="center"
+                                                color={'CaptionText'} bgcolor={'ButtonShadow'}
+                                            >
+                                                {header}
+                                            </Grid>
+                                        )
+                                    }
+                                )
+                            }
 
-                        {
-                            settings.fields.map((field, i) => {
-                                    return field.map((col, j) => {
-                                            let content = null;
-                                            if (col['type'] === 'i') {
-                                                content = i + 1;
-                                            } else if (col['type'] === 'text') {
-                                                content = col['label'];
-                                            } else if (
-                                                col['type'] === 'text_field'
-                                                || col['type'] === 'number_field'
-                                                || col['type'] === 'textarea_field'
-                                            ) {
-                                                if (col['name'] in data) {
-                                                    content = data[col['name']];
+                            {
+                                settings.fields.map((field, i) => {
+                                        return field.map((col, j) => {
+                                                let content = null;
+                                                if (col['type'] === 'i') {
+                                                    content = i + 1;
+                                                } else if (col['type'] === 'text') {
+                                                    content = col['label'];
+                                                } else if (
+                                                    col['type'] === 'text_field'
+                                                    || col['type'] === 'number_field'
+                                                    || col['type'] === 'textarea_field'
+                                                ) {
+                                                    if (col['name'] in data) {
+                                                        content = data[col['name']];
+                                                    }
+                                                } else if (col['type'] === 'date_field') {
+                                                    content = dayjs(col['label']).format('DD.MM.YYYY');
                                                 }
-                                            } else if (col['type'] === 'date_field') {
-                                                content = dayjs(col['label']).format('DD.MM.YYYY');
-                                            }
 
-                                            return (
-                                                <Grid
-                                                    key={"protocol_table_" + i + "_" + j}
-                                                    size={settings.col_widths[j]}
-                                                    padding={1}
-                                                    textAlign='center'
-                                                    alignContent="center"
-                                                    color={"#888"}
-                                                >
-                                                    {content}
-                                                </Grid>
-                                            );
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                    </Grid>
-                </Box>
+                                                return (
+                                                    <Grid
+                                                        key={"protocol_table_" + i + "_" + j}
+                                                        size={settings.col_widths[j]}
+                                                        padding={1}
+                                                        textAlign='center'
+                                                        alignContent="center"
+                                                        color={"#888"}
+                                                    >
+                                                        {content}
+                                                    </Grid>
+                                                );
+                                            }
+                                        )
+                                    }
+                                )
+                            }
+                        </Grid>
+                    </Box>
+                    : ""
             }
         </Box>
     )

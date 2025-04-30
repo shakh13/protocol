@@ -1,7 +1,9 @@
 import json
 
+from django.db.models.functions import TruncQuarter
 from django.shortcuts import render
 from django.template.defaultfilters import slice_filter
+from datetime import datetime
 from knox.serializers import UserSerializer
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
@@ -87,7 +89,13 @@ def qr_generator(data):
     return img_io
 
 
-def generate_protocol_pdf(request):
+def generate_protocol_pdf(request, pk):
+    p = Protocol.objects.get(pk=pk)
+    if not p or p.status == 0:  # Check if exists or completed
+        return Response({"error": "Protocol not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    protocol = ProtocolSerializer(p, many=False).data
+
     class PDF(FPDF):
         def __init__(self, **kwargs):
             super(PDF, self).__init__(**kwargs)
@@ -103,7 +111,7 @@ def generate_protocol_pdf(request):
             self.cell(
                 0,
                 5,
-                f'Протокол испытаний № SB – 1 от 17.03.2025 г.',
+                f'Протокол испытаний № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от 17.03.2025 г.',
                 ln=1,
                 align='C'
             )
@@ -120,15 +128,16 @@ def generate_protocol_pdf(request):
     pdf = PDF(orientation='p', unit='mm', format='A4')
 
     pdf.alias_nb_pages()
-    pdf.title = 'Протокол'
+    pdf.title = f'Протокол № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]}'
     pdf.set_auto_page_break(auto=True, margin=18)
     pdf.add_page()
 
     # add protocol data here
     pdf.set_font("dejavu", "B", 10)
     pdf.cell(0, 5, "Научно-исследовательская и испытательная лаборатория", align='C', ln=True)
-    pdf.cell(0, 5, "ООО «MINTAQA SINOV MARKAZI»", align='C', ln=True)
-    pdf.cell(0, 5, "Research and testing laboratory of «MINTAQA SINOV MARKAZI» LLC", align='C', ln=True)
+    pdf.cell(0, 5, protocol['laboratory']['name'], align='C', ln=True)
+    if protocol['language'] == 'en':
+        pdf.cell(0, 5, protocol['laboratory']['name_en'], align='C', ln=True)
 
     pdf.ln(4)
 
@@ -143,18 +152,19 @@ def generate_protocol_pdf(request):
                    padding=(1, 2, 1, 2),
                    ) as table:
         row = table.row()
-        row.cell("Адрес / Address", style=style)
+        row.cell(f"Адрес{' / Address' if protocol['language'] == 'en' else ''}", style=style)
         row.cell(
-            "Самаркандская область, Самаркандский район, МСГ Корасув, тер. ул. Мотрид агротехсервис / Samarkand region, Samarkand district, MSG Korasuv, ter. st. Motrid agrotechservice")
-        row.cell(img=qr_generator("https://rtc-test.uz/protocol/1"), img_fill_width=False, rowspan=3)
+            f"{protocol['laboratory']['address']}{'/' + protocol['laboratory']['address_en'] if protocol['language'] == 'en' else ''}",
+        )
+        row.cell(img=qr_generator("https://rtc-test.uz/protocol-pdf/" + str(pk)), img_fill_width=False, rowspan=3)
 
         row = table.row()
-        row.cell("Телефон / Phone", style=style)
-        row.cell("+998915492750")
+        row.cell(f"Телефон{' / Phone' if protocol['language'] == 'en' else ''}", style=style)
+        row.cell(protocol['laboratory']['phone'])
 
         row = table.row()
         row.cell("E-mail:", style=style)
-        row.cell("sultanovaminaka@mail.ru")
+        row.cell(protocol['laboratory']['email'])
 
     pdf.ln(4)
 
@@ -164,19 +174,279 @@ def generate_protocol_pdf(request):
                    line_height=5,
                    ) as table:
         row = table.row()
-        row.cell("Утверждаю / Approve", style=style)
-        row.cell("Начальник лаборатории - Якубов Д.Ф\nHead of the laboratory - Yakubov D.F.")
-
+        row.cell(f"Утверждаю{' / Approve' if protocol['language'] == 'en' else ''}", style=style)
+        row.cell(
+            f"Начальник лаборатории - {protocol['laboratory']['boss']}"
+            + ('\nHead of the laboratory - ' +
+               protocol['laboratory']['boss_en'] if
+               protocol['language'] == 'en' else '')
+        )
     pdf.ln(4)
 
-    # generate
-    protocol = Beton08PDF(pdf)
-    protocol.generate()
+    style = FontFace(fill_color=(245, 245, 245), emphasis="B", size_pt=9)
+
+    pdf.set_font("dejavu", "B", 10)
+    pdf.cell(0, 10,
+             f'ПРОТОКОЛ ИСПЫТАНИЙ № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {datetime.strptime(protocol["start_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г.',
+             align='C', ln=1)
+    if protocol['language'] == 'en':
+        pdf.cell(0, 0,
+                 f'TEST REPORT № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {datetime.strptime(protocol["start_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} y.',
+                 align='C', ln=True)
+        pdf.ln(5)
+    if protocol['language'] == 'en':
+        TABLE_DATA = [
+            [
+                'Наименование заказчика\nCustomer name',
+                protocol['client']['name']
+            ],
+            [
+                'Наименование объекта\nObject name',
+                f"{protocol['building']['name'] if protocol['building'] else '-'}"
+            ],
+            [
+                'Наименование продукции\nProduct name',
+                f"{protocol['product_name']}\n{protocol['product_name_eng']}"
+            ],
+            [
+                'Обозначение и данные маркировки объекта испытаний\nDesignation and marking data of the test object',
+                f"{protocol['building_data']}\n{protocol['building_data_eng']}"
+            ],
+            [
+                'Наименование изготовителя\nManufacturer’s name',
+                f"{protocol['producer_name']}\n{protocol['producer_name_eng']}"
+            ],
+            [
+                'Вид испытания\nType of test',
+                f"{protocol['test_type']}\n{protocol['test_type_eng']}"
+            ],
+            [
+                'НД на объекты испытаний\nRD on test object',
+                f"{protocol['rd_test_building']}\n{protocol['rd_test_building_eng']}"
+            ],
+            [
+                'НД на методы испытаний\nRD on testing methods',
+                f"{protocol['rd_test_method']}\n{protocol['rd_test_method_eng']}"
+            ],
+            [
+                'Дополнения, отклонения или исключения из метода\nAdditions, deviations or exceptions to the method',
+                f"{protocol['addition']}\n{protocol['addition_eng']}"
+            ],
+            [
+                'Испытания, проведенные субподрядчиком\nTests carried out by subcontractor',
+                f"{protocol['subcontractor']}\n{protocol['subcontractor_eng']}"
+            ],
+            [
+                'Дата начала испытания\nTest start date',
+                f'{datetime.strptime(protocol["start_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г'
+            ],
+            [
+                'Дата завершения испытания\nTest completion date',
+                f'{datetime.strptime(protocol["end_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г'
+            ],
+        ]
+    else:
+        TABLE_DATA = [
+            [
+                'Наименование заказчика',
+                protocol['client']['name']
+            ],
+            [
+                'Наименование объекта',
+                f"{protocol['building']['name'] if protocol['building'] else '-'}"
+            ],
+            [
+                'Наименование продукции',
+                protocol['product_name']
+            ],
+            [
+                'Обозначение и данные маркировки объекта испытаний',
+                protocol['building_data']
+            ],
+            [
+                'Наименование изготовителя',
+                protocol['producer_name']
+            ],
+            [
+                'Вид испытания',
+                protocol['test_type']
+            ],
+            [
+                'НД на объекты испытаний',
+                protocol['rd_test_building']
+            ],
+            [
+                'НД на методы испытаний',
+                protocol['rd_test_method']
+            ],
+            [
+                'Дополнения, отклонения или исключения из метода',
+                protocol['addition']
+            ],
+            [
+                'Испытания, проведенные субподрядчиком',
+                protocol['subcontractor']
+            ],
+            [
+                'Дата начала испытания',
+                f'{datetime.strptime(protocol["start_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г'
+            ],
+            [
+                'Дата завершения испытания',
+                f'{datetime.strptime(protocol["end_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г'
+            ],
+        ]
+
+    pdf.set_font("dejavu", "", 9)
+    with pdf.table(
+            first_row_as_headings=False,
+            text_align="L",
+            line_height=5,
+            col_widths=[70, 120],
+            padding=(1, 2, 1, 2)
+    ) as table:
+        for data in TABLE_DATA:
+            row = table.row()
+            row.cell(data[0], style=style)
+            row.cell(data[1])
+
+    pdf.ln(5)
+
+    pdf.set_font("dejavu", "B", 11)
+    pdf.cell(0, 11, f"Условия окружающей среды{' / Environmental conditions' if protocol['language'] == 'en' else ''}",
+             align='L', ln=1)
+
+    TABLE_DATA = [
+        [
+            f"Температура{' / Temperature' if protocol['language'] == 'en' else ''}",
+            f"{protocol['temperature_from']}-{protocol['temperature_to']} °С"
+        ],
+        [
+            f"Относительная влажность{' / Relative humidity' if protocol['language'] == 'en' else ''}",
+            f"{protocol['humidity_from']}-{protocol['humidity_to']} %"
+        ],
+    ]
+
+    pdf.set_font("dejavu", "", 9)
+    with pdf.table(
+            first_row_as_headings=False,
+            text_align="L",
+            line_height=5,
+            col_widths=[70, 120],
+            padding=(1, 2, 1, 2)
+    ) as table:
+        for data in TABLE_DATA:
+            row = table.row()
+            row.cell(data[0], style=style)
+            row.cell(data[1])
+
+    pdf.ln(7)
+
+    pdf.set_font("dejavu", "B", 11)
+    pdf.multi_cell(0, 6,
+                   f"При испытании использовались следующие приборы и средства измерений{' / Following instruments and measuring tools were used during the testing' if protocol['language'] == 'en' else ''}",
+                   align='L', ln=1)
+
+    pdf.ln(3)
+
+    if protocol['language'] == 'en':
+        TABLE_DATA = [
+            [
+                'Наименование\nName',
+                '№ сертификата\nCertificate No.',
+                'Дата выдачи\nDate of issue'
+            ],
+        ]
+    else:
+        TABLE_DATA = [
+            [
+                'Наименование',
+                '№ сертификата',
+                'Дата выдачи'
+            ],
+        ]
+    for machine in protocol['machines']:
+        TABLE_DATA.append([
+            machine['name'],
+            machine['certificate_number'],
+            datetime.strptime(machine['certificate_expiry_date'], "%Y-%m-%d").strftime("%d.%m.%Y"),
+        ])
+
+    pdf.set_font("dejavu", "", 9)
+    with pdf.table(
+            first_row_as_headings=True,
+            headings_style=FontFace(fill_color=(245, 245, 245), emphasis="B", size_pt=9),
+            text_align="L",
+            line_height=5,
+            col_widths=[90, 60, 40],
+            padding=(1, 2, 1, 2)
+    ) as table:
+        i = 0
+        for data in TABLE_DATA:
+            row = table.row()
+            align = "C" if i == 0 else "L"  # heading is center, others are left
+            row.cell(data[0], align=align)
+            row.cell(data[1], align=align)
+            row.cell(data[2], align=align)
+            i = i + 1
+
+    pdf.ln(5)
+
+    data = json.loads(protocol['data'])
+
+    if len(data) > 0:
+        settings = json.loads(protocol['type']['settings'])
+        TABLE_DATA = [
+            settings['headers'],
+        ]
+
+        for i in range(0, len(settings['fields'])):
+            row = []
+            for j in range(0, len(settings['fields'][i])):
+                if settings['fields'][i][j]['type'] == "i":
+                    row.append(i + 1)
+                elif settings['fields'][i][j]['type'] == "text":
+                    row.append(settings['fields'][i][j]['label'])
+                elif settings['fields'][i][j]['type'] in ["text_field", "textarea_field", "number_field"]:
+                    if settings['fields'][i][j]['name'] in data:
+                        row.append(data[settings['fields'][i][j]['name']])
+                    else:
+                        row.append("-")
+                elif settings['fields'][i][j]['type'] == "date_field":
+                    if settings['fields'][i][j]['name'] in data:
+                        row.append(
+                            datetime.strptime(data[settings['fields'][i][j]['name']], "%Y-%m-%d").strftime("%d.%m.%Y"))
+                    else:
+                        row.append("-")
+
+            TABLE_DATA.append(row)
+
+        pdf.set_font("dejavu", "B", 11)
+        pdf.cell(0, 11, f"Результаты испытаний{' / Test results' if protocol['language'] == 'en' else ''}", align='C',
+                 ln=1)
+
+        pdf.set_font("dejavu", "", 9)
+
+        with pdf.table(
+                first_row_as_headings=True,
+                headings_style=FontFace(fill_color=(245, 245, 245), emphasis="B", size_pt=9),
+                text_align="L",
+                line_height=5,
+                col_widths=settings["col_widths"],
+                padding=(1, 2, 1, 2)
+        ) as table:
+            for d in TABLE_DATA:
+                row = table.row()
+                for i in range(0, len(d)):
+                    row.cell(str(d[i]), align="C")
 
     pdf.ln(4)
 
     TABLE_DATA = [
-        ['Испытатель / Tester', 'Лаборант ФМИ - Турсунов У.К.\nLaboratory assistant for PMT - Турсунов У.К.'],
+        [
+            f"Испытатель{' / Tester' if protocol['language'] == 'en' else ''}",
+            f"{protocol['user']['position']['name']} - {protocol['user']['fullname']}\n{protocol['user']['position']['name_en']} - {protocol['user']['fullname']}"
+        ],
     ]
 
     pdf.set_font("dejavu", "", 9)
@@ -195,7 +465,10 @@ def generate_protocol_pdf(request):
     pdf.ln(4)
 
     pdf.set_font("dejavu", "I", 10)
-    txt = 'ИЛ ООО «MINTAQA SINOV MARKAZI» берёт на себя ответственность за всю информацию приведенную в протоколе испытаний, кроме информации предоставленной заказчиком.\nTL «MINTAQA SINOV MARKAZI» LLC assumes responsibility forall information provided in the test report, except for the information provided by the customer'
+    txt = (f"{protocol['laboratory']['protocol_ending']}" +
+           (
+               '\n' + protocol['laboratory']['protocol_ending_en'] if protocol['language'] == 'en' else ''
+           ))
     pdf.multi_cell(w=190, h=5, txt=txt, padding=2, align="C")
 
     pdf.ln(4)
@@ -208,7 +481,8 @@ def generate_protocol_pdf(request):
     pdf.ln(4)
 
     pdf.set_font("dejavu", "I", 10)
-    pdf.multi_cell(0, 5, 'Конец протокола испытаний\nEnd of test report', align='C', ln=1)
+    pdf.multi_cell(0, 5, "Конец протокола испытаний" + ('\nEnd of test report' if protocol['language'] == 'en' else ''),
+                   align='C', ln=1)
 
     pdf.output(buffer, 'F')
     buffer.seek(0)
@@ -319,9 +593,12 @@ class BuildingViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         request.data['laboratory'] = request.user.laboratory.id
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=201)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        else:
+            return Response(serializer.errors, status=400)
 
     def update(self, request, *args, **kwargs):
         instance = get_object_or_404(Building, pk=self.kwargs['pk'])  # Get existing building
@@ -678,7 +955,7 @@ def get_protocol_types(request):
 def add_protocol(request):
     protocol = str(json.dumps(request.data['protocol']))
 
-    request.data['laboratory'] = request.user.laboratory.id
+    request.data['laboratory_id'] = request.user.laboratory.id
     request.data['user_id'] = request.user.id
     request.data['data'] = protocol
     request.data['status'] = 0
@@ -734,7 +1011,7 @@ def update_protocol(request, pk):
     request.data['data'] = protocol_data
 
     # Ensure lab is consistent with the logged-in user
-    request.data['laboratory'] = request.user.laboratory.id
+    request.data['laboratory_id'] = request.user.laboratory.id
     request.data['status'] = 0
 
     machine_ids = request.data.pop('machines', None)

@@ -25,5 +25,5 @@ urlpatterns = [
                   path('edit_protocol_requests', get_edit_protocol_requests, name='edit_protocol_requests'),
                   path('user_protocols/<int:pk>', get_user_protocols, name='user_protocols'),
                   path('all_protocols', get_all_protocols, name='all_protocols'),
-                  path('generate-pdf', generate_protocol_pdf, name='generate-pdf'),
+                  path('generate-pdf/<int:pk>', generate_protocol_pdf, name='generate-pdf'),
               ] + router.urls

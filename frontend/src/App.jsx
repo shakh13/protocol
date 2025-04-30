@@ -31,13 +31,13 @@ export default function App() {
     const noNavBar = location.pathname === "/register"
         || location.pathname === "/"
         || location.pathname.includes("password")
-        || location.pathname === "/protocol-pdf";
+        || location.pathname.startsWith("/protocol-pdf");
 
     return (
         <>
             <Navbar noNavBar={noNavBar} content={
                 <Routes>
-                    <Route path="/protocol-pdf" element={<Protocol/>}/>
+                    <Route path="/protocol-pdf/:id" element={<Protocol/>}/>
                     <Route path="/" element={<LoginPage/>}/>
                     <Route element={<ProtectedPersonalRoute/>}>
                         <Route path="/clients" element={<ClientsPage/>}/>
