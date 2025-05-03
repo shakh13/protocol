@@ -953,11 +953,17 @@ def get_protocol_types(request):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def add_protocol(request):
-    protocol = str(json.dumps(request.data['protocol']))
+    # protocol = [d for d in request.data['protocol'] if any(f != '' for f in d)]
+
+    protocol = [
+        d for d in request.data['protocol']
+        if any(value != "" for value in d.values())
+    ]
 
     request.data['laboratory_id'] = request.user.laboratory.id
-    request.data['user_id'] = request.user.id
-    request.data['data'] = protocol
+    if 'user_id' not in request.data:
+        request.data['user_id'] = request.user.id
+    request.data['data'] = json.dumps(protocol)
     request.data['status'] = 0
 
     serializer = ProtocolSerializer(data=request.data)

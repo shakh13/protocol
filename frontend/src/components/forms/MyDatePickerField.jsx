@@ -4,12 +4,13 @@ import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {DatePicker} from "@mui/x-date-pickers/DatePicker";
 import {Controller} from "react-hook-form";
 import dayjs from "dayjs";
+import 'dayjs/locale/ru';
 
 
 export default function MyDatePickerField(props) {
     const {label, name, control} = props
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
             <Controller
                 name={name}
                 control={control}
@@ -22,7 +23,10 @@ export default function MyDatePickerField(props) {
                         required
                         placeholder={label}
                         sx={{width: '100%', marginY: '7px'}}
-                        onChange={onChange}
+                        onChange={(newValue) => {
+                            // Pass null to form if no date selected
+                            onChange(newValue ? newValue.toISOString() : null);
+                        }}
                         format="DD.MM.YYYY"
                         value={value ? dayjs(value) : null}
                         slotProps={{

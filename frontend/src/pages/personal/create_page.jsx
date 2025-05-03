@@ -19,6 +19,7 @@ import NoData from "../../components/NoData.jsx";
 import ProtocolForm from "./protocol_forms/protocol_form.jsx";
 import dayjs from "dayjs";
 import ProtocolFormNew from "./protocol_forms/protocol_form_new.jsx";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 
 export default function CreatePage() {
@@ -30,6 +31,8 @@ export default function CreatePage() {
     const [selectedLang, setSelectedLang] = React.useState('ru');
     const [selectedClient, setSelectedClient] = React.useState(null);
     const [selectedProtocol, setSelectedProtocol] = React.useState(null);
+
+    const [protocolHeaders, setProtocolHeaders] = React.useState(null);
 
     const [machines, setMachines] = React.useState([]);
 
@@ -161,6 +164,7 @@ export default function CreatePage() {
             resolver: yupResolver(selectedLang === 'ru' ? validationSchemeRu([]) : validationSchemeEn([])),
             defaultValues: {
                 machines: [],
+                language: {value: 'ru', label: 'Русский'},
             }
         }
     );
@@ -171,27 +175,26 @@ export default function CreatePage() {
         name: "machines",
     });
 
-    const {fields: dataFields, append: dataAppend, remove: dataRemove} = useFieldArray({
-        control,
-        name: "data",
-    })
-
     const onSubmit = (data) => {
         // console.log(data, selectedProtocol);
-        let protocol = {};
-        if (!selectedProtocol.settings.isEmpty)
-            selectedProtocol.settings['fields'].map((field) => {
-                field.map((col) => {
-                    if (col['type'] !== 'i' && col['type'] !== 'text') {
-                        if (col['type'] === 'date_field') {
-                            protocol[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
-                        } else {
-                            protocol[col.name] = data[col.name]
-                        }
-                    }
-                });
-            });
+        // let protocol = {};
+        // if (!selectedProtocol.settings.isEmpty)
+        //     selectedProtocol.settings['fields'].map((field) => {
+        //         field.map((col) => {
+        //             if (col['type'] !== 'i' && col['type'] !== 'text') {
+        //                 if (col['type'] === 'date_field') {
+        //                     protocol[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
+        //                 } else {
+        //                     protocol[col.name] = data[col.name]
+        //                 }
+        //             }
+        //         });
+        //     });
 
+        console.log(data)
+        // data.data.map((d) => {
+        //     console.log(d)
+        // })
 
         let m = [];
         data.machines.map((machine) => {
@@ -202,7 +205,7 @@ export default function CreatePage() {
             client_id: data.client.value,
             building_id: data.building !== null ? data.building.value : null,
             type_id: data.protocol_type.value,
-            protocol: protocol,
+            protocol: data.data,
             machines: m,
             note: data.note,
             product_name: data.product_name,
@@ -243,7 +246,142 @@ export default function CreatePage() {
     // Works when client changes
     useEffect(() => {
         setValue("building", null);
-    }, [selectedClient]); // Runs when `filteredBuildings` changes
+    }, [selectedClient]);
+
+    let {fields: dataFields, append: dataAppend, remove: dataRemove} = useFieldArray({
+        control,
+        name: "data",
+    })
+
+    function addDataField(i) {
+        let f = [];
+        if (selectedProtocol !== null) {
+
+            selectedProtocol.settings.fields.map((field, index) => {
+                if (field['type'] === 'i') {
+                    f.push(
+                        <Grid
+                            key={"protocol_table_" + i + "_" + index}
+                            size={selectedProtocol.settings.col_widths[index]}
+                            padding={1}
+                            textAlign='center'
+                            alignContent="center"
+                        >
+                            {i + 1}
+                        </Grid>
+                    );
+                } else if (field['type'] === 'text_field') {
+                    f.push(
+                        <Grid
+                            key={"protocol_table_" + i + "_" + index}
+                            size={selectedProtocol.settings.col_widths[index]}
+                            padding={1}
+                            textAlign='center'
+                            alignContent="center"
+                        >
+                            <MyTextField name={`data.${i}.${field.name}`} control={control}/>
+                        </Grid>
+                    )
+                } else if (field['type'] === 'textarea_field') {
+                    f.push(
+                        <Grid
+                            key={"protocol_table_" + i + "_" + index}
+                            size={selectedProtocol.settings.col_widths[index]}
+                            padding={1}
+                            textAlign='center'
+                            alignContent="center"
+                        >
+                            <MyTextareaField name={`data.${i}.${field.name}`} control={control}/>
+                        </Grid>
+                    )
+                } else if (field['type'] === 'number_field') {
+                    f.push(
+                        <Grid
+                            key={"protocol_table_" + i + "_" + index}
+                            size={selectedProtocol.settings.col_widths[index]}
+                            padding={1}
+                            type={"number"}
+                            textAlign='center'
+                            alignContent="center"
+                        >
+                            <MyTextField name={`data.${i}.${field.name}`} control={control}/>
+                        </Grid>
+                    )
+                } else if (field['type'] === 'date_field') {
+                    f.push(
+                        <Grid
+                            key={"protocol_table_" + i + "_" + index}
+                            size={selectedProtocol.settings.col_widths[index]}
+                            padding={1}
+                            textAlign='center'
+                            alignContent="center"
+                        >
+                            <MyDatePickerField
+                                name={`data.${i}.${field.name}`}
+                                label="Дата"
+                                control={control}
+                            />
+                        </Grid>
+                    )
+                }
+            })
+        }
+
+        f.push(
+            <Grid
+                key={"protocol_table_remove" + i}
+                size={15}
+                padding={1}
+                textAlign='center'
+                alignContent="center"
+            >
+                <IconButton
+                    onClick={() => dataRemove(i)}
+                >
+                    <DeleteIcon/>
+                </IconButton>
+            </Grid>
+        )
+
+        return (f)
+    }
+
+    useEffect(() => {
+        if (selectedProtocol) {
+            let h = [];
+            selectedProtocol.settings['headers' + (selectedLang === 'en' ? '_en' : '')].map((header, index) => {
+                h.push(<Grid
+                    key={"protocol_table_header_" + index}
+                    size={selectedProtocol.settings.col_widths[index]}
+                    padding={1}
+                    textAlign='center'
+                    alignContent="center"
+                >
+                    {header}
+                </Grid>);
+            })
+            h.push(
+                <Grid
+                    key={"protocol_table_header_add"}
+                    size={15}
+                    padding={1}
+                    textAlign='center'
+                    alignContent="center"
+                >
+                    <IconButton onClick={() => dataAppend({})}><Add/></IconButton>
+                </Grid>
+            )
+
+            setProtocolHeaders(h)
+        }
+
+        while (dataFields.length > 0) {
+            dataRemove(dataFields.pop())
+        }
+
+        dataAppend({})
+
+    }, [selectedProtocol, selectedLang]);
 
 
     return (
@@ -569,11 +707,32 @@ export default function CreatePage() {
 
                                         <Box>
                                             {"headers" in selectedProtocol.settings &&
-                                                <ProtocolFormNew
-                                                    control={control}
-                                                    settings={selectedProtocol.settings}
-                                                    language={selectedLang}
-                                                />
+                                                <Grid
+                                                    container
+                                                    sx={{
+                                                        marginTop: "15px",
+                                                        minWidth: "720px",
+                                                        '--Grid-borderWidth': '1px',
+                                                        borderTop: 'var(--Grid-borderWidth) solid',
+                                                        borderLeft: 'var(--Grid-borderWidth) solid',
+                                                        borderColor: 'divider',
+                                                        wordWrap: 'break-word',
+                                                        '& > div': {
+                                                            borderRight: 'var(--Grid-borderWidth) solid',
+                                                            borderBottom: 'var(--Grid-borderWidth) solid',
+                                                            borderColor: 'divider',
+                                                        },
+                                                    }}
+                                                    columns={{xs: 205, sm: 205, md: 205, lg: 205, xl: 205}}
+                                                >
+                                                    {protocolHeaders}
+                                                    {dataFields.length === 0 && <NoData message={"Добавьте данные"}/>}
+                                                    {
+                                                        dataFields.map((item, index) => (
+                                                            addDataField(index)
+                                                        ))
+                                                    }
+                                                </Grid>
                                             }
                                         </Box>
 
