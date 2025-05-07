@@ -3,10 +3,28 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 import Typography from "@mui/material/Typography";
-import ProtocolView from "../protocol_forms/protocol_view.jsx";
+import {useEffect, useState} from "react";
 
 export default function ViewProtocol(props) {
     const {protocol} = props;
+    const [settings, setSettings] = useState({});
+    const [protocolHeaders, setProtocolHeaders] = useState([]);
+    const [protocolData, setProtocolData] = useState([]);
+
+    function getData() {
+        const s = JSON.parse(protocol.type.settings);
+        setSettings(s);
+
+        if ("headers" in s) {
+            setProtocolHeaders(s.headers);
+        }
+
+        setProtocolData(JSON.parse(protocol.data));
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     return (
         <Box>
@@ -200,22 +218,112 @@ export default function ViewProtocol(props) {
                 }
             </Grid>
 
-            <ProtocolView protocol={protocol}/>
+            {
+                "headers" in settings &&
 
-            <Typography
-                variant="body1"
-                component="div"
-            >
-                Примечание
-            </Typography>
-            <Typography
-                variant="body2"
-                component="div"
-                color={"textSecondary"}
-            >
-                {protocol.note}
-            </Typography>
+                <Box>
+                    <Typography
+                        variant="body1"
+                        component="div"
+                        sx={{marginY: 'auto'}}
+                    >
+                        Результаты испытаний
+                    </Typography>
 
+                    <Grid
+                        container
+                        sx={{
+                            marginTop: "15px",
+                            marginBottom: 2,
+                            minWidth: "720px",
+                            '--Grid-borderWidth': '1px',
+                            borderTop: 'var(--Grid-borderWidth) solid',
+                            borderLeft: 'var(--Grid-borderWidth) solid',
+                            borderColor: 'divider',
+                            wordWrap: 'break-word',
+                            '& > div': {
+                                borderRight: 'var(--Grid-borderWidth) solid',
+                                borderBottom: 'var(--Grid-borderWidth) solid',
+                                borderColor: 'divider',
+                            },
+                        }}
+                        columns={{xs: 190, sm: 190, md: 190, lg: 190, xl: 190}}
+                    >
+                        {
+                            protocolHeaders.map((header, i) => {
+                                return (
+                                    <Grid
+                                        size={settings.col_widths[i]}
+                                        key={"protocol_header_" + i}
+                                        padding={1}
+                                        textAlign='center'
+                                        alignContent="center"
+                                    >
+                                        {header}
+                                    </Grid>
+                                );
+                            })
+                        }
+
+                        {
+                            protocolData.map((field, i) => {
+                                    return settings.fields.map((col, j) => {
+                                            let content = null;
+                                            if (col['type'] === 'i') {
+                                                content = i + 1;
+                                            } else if (col['type'] === 'text') {
+                                                content = col['label'];
+                                            } else if (
+                                                col['type'] === 'text_field'
+                                                || col['type'] === 'number_field'
+                                                || col['type'] === 'textarea_field'
+                                            ) {
+                                                if (col['name'] in field) {
+                                                    content = field[col['name']];
+                                                }
+                                            } else if (col['type'] === 'date_field') {
+                                                content = dayjs(col['label']).format('DD.MM.YYYY');
+                                            }
+
+                                            return (
+                                                <Grid
+                                                    key={"protocol_table_" + i + "_" + j}
+                                                    size={settings.col_widths[j]}
+                                                    padding={1}
+                                                    textAlign='center'
+                                                    alignContent="center"
+                                                    color={"#888"}
+                                                >
+                                                    {content}
+                                                </Grid>
+                                            );
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    </Grid>
+
+                </Box>
+            }
+
+            {protocol.note.length > 0 &&
+                <>
+                    <Typography
+                        variant="body1"
+                        component="div"
+                    >
+                        Примечание
+                    </Typography>
+                    <Typography
+                        variant="body2"
+                        component="div"
+                        color={"textSecondary"}
+                    >
+                        {protocol.note}
+                    </Typography>
+                </>
+            }
         </Box>
     )
 }

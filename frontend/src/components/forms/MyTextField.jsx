@@ -14,11 +14,6 @@ export default function MyTextField(props) {
                          field: {onChange, value},
                          fieldState: {error},
                      }) => {
-                // Return null if value is empty (null or undefined or empty string)
-                if (value === null || value === undefined || value === '') {
-                    return null;
-                }
-
                 return (
                     <TextField
                         key={name}
@@ -26,10 +21,10 @@ export default function MyTextField(props) {
                         margin="dense"
                         placeholder={label}
                         type={type ?? "text"}
-                        onChange={(newValue) => {
-                            onChange(newValue ?? null);
+                        onChange={(e) => {
+                            onChange(e.target.value ?? "");
                         }}
-                        value={value}
+                        value={value ?? ''}
                         slotProps={{
                             input: {
                                 endAdornment: adornment ? (

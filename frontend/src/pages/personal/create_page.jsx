@@ -16,9 +16,7 @@ import MyDatePickerField from "../../components/forms/MyDatePickerField.jsx";
 import MyTextareaField from "../../components/forms/MyTextareaField.jsx";
 import {Add, Delete} from "@mui/icons-material";
 import NoData from "../../components/NoData.jsx";
-import ProtocolForm from "./protocol_forms/protocol_form.jsx";
 import dayjs from "dayjs";
-import ProtocolFormNew from "./protocol_forms/protocol_form_new.jsx";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 

@@ -23,6 +23,7 @@ export default function AdminProtocol() {
         setLoading(true);
         AxiosInstance.get("protocol/" + id)
             .then((response) => {
+                console.log(response.data);
                 setProtocol(response.data);
             })
             .catch((error) => {
@@ -52,7 +53,7 @@ export default function AdminProtocol() {
 
     return (
         <Container>
-            {loading
+            {loading && "settings" in protocol
                 ? <Waiting/>
                 : <>
                     <Box sx={{
@@ -72,7 +73,7 @@ export default function AdminProtocol() {
                                 <IconButton
                                     component={Link}
                                     variant={"text"}
-                                    href={"/protocol-pdf"}
+                                    href={"/protocol-pdf/" + id}
                                     underline="none"
                                 >
                                     <CloudDownloadIcon/>
@@ -120,10 +121,12 @@ export default function AdminProtocol() {
                             {protocol.type?.name}
                         </Grid>
                     </Grid>
-                    <EditProtocol
-                        protocol={protocol}
-                        availableMachines={availableMachines}
-                    />
+                    {Object.keys(protocol).length > 0 &&
+                        <EditProtocol
+                            protocol={protocol}
+                            availableMachines={availableMachines}
+                        />
+                    }
                 </>
             }
         </Container>

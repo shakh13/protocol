@@ -89,10 +89,11 @@ def qr_generator(data):
     return img_io
 
 
+@api_view(['GET'])
 def generate_protocol_pdf(request, pk):
     p = Protocol.objects.get(pk=pk)
     if not p or p.status == 0:  # Check if exists or completed
-        return Response({"error": "Protocol not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     protocol = ProtocolSerializer(p, many=False).data
 
@@ -108,10 +109,12 @@ def generate_protocol_pdf(request, pk):
             self.set_y(-17)
             self.set_font('dejavu', 'I', 10)
 
+            start_date = datetime.strptime(protocol['start_date'], "%Y-%m-%d").strftime("%d.%m.%Y")
+
             self.cell(
                 0,
                 5,
-                f'Протокол испытаний № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от 17.03.2025 г.',
+                f'Протокол испытаний № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {start_date} г.',
                 ln=1,
                 align='C'
             )
@@ -134,7 +137,7 @@ def generate_protocol_pdf(request, pk):
 
     # add protocol data here
     pdf.set_font("dejavu", "B", 10)
-    pdf.cell(0, 5, "Научно-исследовательская и испытательная лаборатория", align='C', ln=True)
+    # pdf.cell(0, 5, "Научно-исследовательская и испытательная лаборатория", align='C', ln=True)
     pdf.cell(0, 5, protocol['laboratory']['name'], align='C', ln=True)
     if protocol['language'] == 'en':
         pdf.cell(0, 5, protocol['laboratory']['name_en'], align='C', ln=True)
@@ -154,7 +157,7 @@ def generate_protocol_pdf(request, pk):
         row = table.row()
         row.cell(f"Адрес{' / Address' if protocol['language'] == 'en' else ''}", style=style)
         row.cell(
-            f"{protocol['laboratory']['address']}{'/' + protocol['laboratory']['address_en'] if protocol['language'] == 'en' else ''}",
+            f"{protocol['laboratory']['address']}{' / ' + protocol['laboratory']['address_en'] if protocol['language'] == 'en' else ''}",
         )
         row.cell(img=qr_generator("https://rtc-test.uz/protocol-pdf/" + str(pk)), img_fill_width=False, rowspan=3)
 
@@ -165,6 +168,13 @@ def generate_protocol_pdf(request, pk):
         row = table.row()
         row.cell("E-mail:", style=style)
         row.cell(protocol['laboratory']['email'])
+
+    my_y = pdf.y
+
+    image_field = p.laboratory.print
+    pdf.image(image_field.path, 128, 15, 40, 40, keep_aspect_ratio=True)
+
+    pdf.set_y(my_y)
 
     pdf.ln(4)
 
@@ -397,25 +407,26 @@ def generate_protocol_pdf(request, pk):
     if len(data) > 0:
         settings = json.loads(protocol['type']['settings'])
         TABLE_DATA = [
-            settings['headers'],
+            settings['headers' + ("_en" if protocol['language'] == 'en' else "")],
         ]
 
-        for i in range(0, len(settings['fields'])):
+        for i in range(0, len(data)):
             row = []
-            for j in range(0, len(settings['fields'][i])):
-                if settings['fields'][i][j]['type'] == "i":
+            for field in settings['fields']:
+                if field['type'] == "i":
                     row.append(i + 1)
-                elif settings['fields'][i][j]['type'] == "text":
-                    row.append(settings['fields'][i][j]['label'])
-                elif settings['fields'][i][j]['type'] in ["text_field", "textarea_field", "number_field"]:
-                    if settings['fields'][i][j]['name'] in data:
-                        row.append(data[settings['fields'][i][j]['name']])
+                elif field['type'] == "text":
+                    row.append(field['label'])
+                elif field['type'] in ["text_field", "textarea_field", "number_field"]:
+                    if field['name'] in data[i]:
+                        row.append(data[i][field['name']])
                     else:
                         row.append("-")
-                elif settings['fields'][i][j]['type'] == "date_field":
-                    if settings['fields'][i][j]['name'] in data:
-                        row.append(
-                            datetime.strptime(data[settings['fields'][i][j]['name']], "%Y-%m-%d").strftime("%d.%m.%Y"))
+                elif field['type'] == "date_field":
+                    if field['name'] in data[i]:
+                        date_str = data[i][field['name']]
+                        parsed_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                        row.append(parsed_date.strftime("%d.%m.%Y"))
                     else:
                         row.append("-")
 
@@ -998,6 +1009,12 @@ def delete_protocol(request, pk):
 def update_protocol_status(request, pk):
     try:
         protocol = Protocol.objects.get(id=pk)
+        if "protocol" in request.data:
+            data = [
+                d for d in request.data['protocol']
+                if any(value != "" for value in d.values())
+            ]
+            request.data['data'] = json.dumps(data)
         protocol.status = request.data['status']
         protocol.save()
         return Response(status=204)
