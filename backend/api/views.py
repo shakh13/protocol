@@ -590,12 +590,25 @@ class BuildingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Building.objects.filter(laboratory=user.laboratory)
+        if user.is_superuser:
+            return Building.objects.filter(laboratory=user.laboratory)
+        else:
+            return user.buildings
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = Building.objects.all()
+        user = self.request.user
+        if user.is_superuser:
+            queryset = Building.objects.all()
+        else:
+            queryset = Building.objects.filter(user=user)
+
         building = get_object_or_404(queryset, pk=self.kwargs['pk'])
-        protocols = ProtocolSerializer(Protocol.objects.filter(building=building).order_by('-id'), many=True)
+        if user.is_superuser:
+            protocols = ProtocolSerializer(Protocol.objects.filter(building=building).order_by('-id'), many=True)
+        else:
+            protocols = ProtocolSerializer(Protocol.objects.filter(building=building, user=user).order_by('-id'),
+                                           many=True)
+
         serializer = self.serializer_class(building)
         data = serializer.data
         data['protocols'] = protocols.data
@@ -645,12 +658,23 @@ class ClientViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Client.objects.filter(laboratory=user.laboratory)
+        if user.is_superuser:
+            return Client.objects.filter(laboratory=user.laboratory)
+        else:
+            return user.clients
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = Client.objects.all()
+        user = self.request.user
+        if user.is_superuser:
+            queryset = Client.objects.all()
+        else:
+            queryset = user.clients
         client = get_object_or_404(queryset, pk=self.kwargs['pk'])
-        protocols = ProtocolSerializer(Protocol.objects.filter(client=client).order_by('-id'), many=True)
+
+        if user.is_superuser:
+            protocols = ProtocolSerializer(Protocol.objects.filter(client=client).order_by('-id'), many=True)
+        else:
+            protocols = ProtocolSerializer(Protocol.objects.filter(client=client, user=user).order_by('-id'), many=True)
         serializer = self.serializer_class(client)
         data = serializer.data
         data['protocols'] = protocols.data

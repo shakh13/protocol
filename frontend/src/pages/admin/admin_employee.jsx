@@ -142,9 +142,8 @@ export default function AdminEmployee() {
                                 Объекты
                             </Typography>
                             <List sx={{width: '100%', minWidth: 360, bgcolor: 'transparent'}}>
-                                {employee.buildings.length === 0 && <NoData/>}
-                                {
-                                    employee.buildings
+                                {!employee.buildings ? <NoData/> :
+                                    employee?.buildings
                                         .map((building) => (
                                             <ListItem alignItems="flex-start"
                                                       key={"building_" + building.id}
@@ -216,8 +215,8 @@ export default function AdminEmployee() {
                                 Заказчики
                             </Typography>
                             <List sx={{width: '100%', minWidth: 360, bgcolor: 'transparent'}}>
-                                {employee.clients.length === 0 && <NoData/>}
-                                {
+                                {!employee.clients ? <NoData/> :
+
                                     employee.clients
                                         .map((client) => (
                                             <ListItem alignItems="flex-start"

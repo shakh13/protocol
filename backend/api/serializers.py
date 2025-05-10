@@ -57,11 +57,21 @@ class BuildingSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
     laboratory = serializers.PrimaryKeyRelatedField(queryset=Laboratory.objects.all())
+
     buildings = BuildingSerializer(many=True, read_only=True)
 
     class Meta:
         model = Client
         fields = '__all__'
+
+    def get_buildings(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_superuser:
+            buildings = obj.buildings.all()
+        else:
+            buildings = obj.buildings.filter(users=request.user)
+
+        return BuildingSerializer(buildings, many=True).data
 
 
 class UserSerializer(serializers.ModelSerializer):

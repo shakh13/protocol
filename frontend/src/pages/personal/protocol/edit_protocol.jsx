@@ -111,7 +111,6 @@ export default function EditProtocol(props) {
     }
 
     function getData() {
-        console.log(protocol);
         setSettings(JSON.parse(protocol.type.settings));
 
         loadProtocolData();

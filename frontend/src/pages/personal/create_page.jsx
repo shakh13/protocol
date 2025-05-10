@@ -333,9 +333,8 @@ export default function CreatePage() {
                 textAlign='center'
                 alignContent="center"
             >
-                <IconButton
-                    onClick={() => dataRemove(i)}
-                >
+                <IconButton onClick={() => dataRemove(i)}>
+                    {/* edit here to remove not last item, but item by index */}
                     <DeleteIcon/>
                 </IconButton>
             </Grid>
@@ -346,31 +345,33 @@ export default function CreatePage() {
 
     useEffect(() => {
         if (selectedProtocol) {
-            let h = [];
-            selectedProtocol.settings['headers' + (selectedLang === 'en' ? '_en' : '')].map((header, index) => {
-                h.push(<Grid
-                    key={"protocol_table_header_" + index}
-                    size={selectedProtocol.settings.col_widths[index]}
-                    padding={1}
-                    textAlign='center'
-                    alignContent="center"
-                >
-                    {header}
-                </Grid>);
-            })
-            h.push(
-                <Grid
-                    key={"protocol_table_header_add"}
-                    size={15}
-                    padding={1}
-                    textAlign='center'
-                    alignContent="center"
-                >
-                    <IconButton onClick={() => dataAppend({})}><Add/></IconButton>
-                </Grid>
-            )
+            if ("headers" in selectedProtocol.settings) {
+                let h = [];
+                selectedProtocol.settings['headers' + (selectedLang === 'en' ? '_en' : '')].map((header, index) => {
+                    h.push(<Grid
+                        key={"protocol_table_header_" + index}
+                        size={selectedProtocol.settings.col_widths[index]}
+                        padding={1}
+                        textAlign='center'
+                        alignContent="center"
+                    >
+                        {header}
+                    </Grid>);
+                })
+                h.push(
+                    <Grid
+                        key={"protocol_table_header_add"}
+                        size={15}
+                        padding={1}
+                        textAlign='center'
+                        alignContent="center"
+                    >
+                        <IconButton onClick={() => dataAppend({})}><Add/></IconButton>
+                    </Grid>
+                )
 
-            setProtocolHeaders(h)
+                setProtocolHeaders(h)
+            }
         }
 
         while (dataFields.length > 0) {

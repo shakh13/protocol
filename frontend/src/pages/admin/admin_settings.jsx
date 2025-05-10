@@ -143,11 +143,11 @@ export default function AdminSettings(props) {
                                 </Typography>
                                 <Box sx={{flexGrow: 1}}>
                                     <Grid container spacing={2}>
-                                        <Grid size={{xs: 6, md: 6}}>
+                                        <Grid size={{xs: 12, md: 12}}>
                                             <MyTextField name={"name"} label={"Название лаборатории"}
                                                          control={control}/>
                                         </Grid>
-                                        <Grid size={{xs: 6, md: 6}}>
+                                        <Grid size={{xs: 12, md: 12}}>
                                             <MyTextField name={"name_en"} label={"Laboratory name"}
                                                          control={control}/>
                                         </Grid>

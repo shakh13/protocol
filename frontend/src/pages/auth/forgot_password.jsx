@@ -13,6 +13,8 @@ function ForgotPassword({open, handleClose}) {
         <Dialog
             open={open}
             onClose={handleClose}
+            fullWidth
+            maxWidth={false}
             slotProps={{
                 paper: {
                     component: 'form',
@@ -20,13 +22,19 @@ function ForgotPassword({open, handleClose}) {
                         event.preventDefault();
                         handleClose();
                     },
-                    sx: {backgroundImage: 'none'},
+                    sx: {
+                        backgroundImage: 'none',
+                        width: '100%',          // Use full dialog width
+                        maxWidth: '400px',      // Cap width (or 90vw if responsive)
+                        boxSizing: 'border-box',
+                        overflowX: 'hidden',
+                    },
                 },
             }}
         >
             <DialogTitle>Сбрось пароля</DialogTitle>
             <DialogContent
-                sx={{display: 'flex', flexDirection: 'column', gap: 2, width: '100%'}}
+                sx={{p: 3}}
             >
                 <DialogContentText>
                     Введите Email, и мы отправим вам ссылку для сброса пароля.
@@ -42,7 +50,7 @@ function ForgotPassword({open, handleClose}) {
                     fullWidth
                 />
             </DialogContent>
-            <DialogActions sx={{pb: 3, px: 3}}>
+            <DialogActions sx={{px: 3, pb: 3}}>
                 <Button onClick={handleClose}>Отмена</Button>
                 <Button variant="contained" type="submit">
                     Продолжить
