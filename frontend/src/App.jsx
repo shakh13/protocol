@@ -62,6 +62,7 @@ export default function App() {
                         <Route path="/admin/machines" element={<AdminMachines/>}/>
                         <Route path="/admin/certificates" element={<AdminCertificates/>}/>
                         <Route path="/admin/settings" element={<AdminSettings/>}/>
+                        <Route path="/admin/create_protocol" element={<CreatePage/>}/>
                     </Route>
                     <Route path="*" element={<NotFoundPage/>}/>
                 </Routes>

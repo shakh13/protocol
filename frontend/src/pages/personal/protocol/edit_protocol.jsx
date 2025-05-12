@@ -156,11 +156,14 @@ export default function EditProtocol(props) {
     }, [protocol]);
 
     const onError = (errors) => {
-        console.log('❌ Form errors:', errors);
+        Swal.fire({
+            title: 'Заполните все поля',
+            icon: "error",
+        });
+        // console.log('❌ Form errors:', errors);
     };
 
     const onSubmit = (data) => {
-        console.log(data);
         let m = [];
         data.machines.map((machine) => {
             m.push(machine.value.value);
@@ -218,7 +221,8 @@ export default function EditProtocol(props) {
                     title: "Протокол завершен",
                     icon: "success",
                 }).then((result) => {
-                    navigate(-1);
+                    navigate(0);
+                    // navigate(-1); // Go back
                 });
             })
             .catch((error) => {

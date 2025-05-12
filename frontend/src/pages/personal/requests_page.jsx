@@ -16,6 +16,7 @@ import Link from "@mui/material/Link";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
 import NoData from "../../components/NoData.jsx";
+import Swal from "sweetalert2";
 
 export default function RequestsPage() {
     const [filteredProtocols, setFilteredProtocols] = useState([]);
@@ -29,7 +30,10 @@ export default function RequestsPage() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -45,7 +49,10 @@ export default function RequestsPage() {
                 getData();
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

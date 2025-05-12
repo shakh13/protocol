@@ -16,6 +16,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ErrorMessage from "../../../components/ErrorMessage.jsx";
 import AxiosInstance from "../../../components/axios_instance.jsx";
+import Swal from "sweetalert2";
 
 
 export default function AddPosition(props) {
@@ -50,7 +51,10 @@ export default function AddPosition(props) {
             })
             .catch((error) => {
                 setAddError(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     };
     const handleClose = () => {

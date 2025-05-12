@@ -19,6 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import {ForwardToInbox} from "@mui/icons-material";
 import DeleteProtocol from "./protocol/delete_protocol.jsx";
+import Swal from "sweetalert2";
 
 export default function ProtocolsPage() {
     const [user, setUser] = React.useState({});
@@ -34,7 +35,10 @@ export default function ProtocolsPage() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -55,10 +59,13 @@ export default function ProtocolsPage() {
                 getData();
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
-    
+
     return (
         <Container>
             <Box sx={{

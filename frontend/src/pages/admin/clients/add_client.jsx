@@ -14,6 +14,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import AxiosInstance from "../../../components/axios_instance.jsx";
 import ErrorMessage from "../../../components/ErrorMessage.jsx";
+import Swal from "sweetalert2";
 
 
 export default function AddClient(props) {
@@ -44,7 +45,10 @@ export default function AddClient(props) {
             setOpen(false);
         }).catch((error) => {
             setAddError(true);
-            console.log(error);
+            Swal.fire({
+                title: error,
+                icon: "error",
+            });
         });
     };
     const handleClose = () => {

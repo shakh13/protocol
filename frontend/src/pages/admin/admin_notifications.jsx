@@ -19,6 +19,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
+import Swal from "sweetalert2";
 
 function generate(element) {
     return [0, 1, 2, 3, 4].map((value) =>
@@ -40,7 +41,10 @@ export default function AdminNotifications() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             })
     }
 
@@ -52,7 +56,10 @@ export default function AdminNotifications() {
                 getData();
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -109,7 +116,7 @@ export default function AdminNotifications() {
                                                         </Link>
                                                     }
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell align="right">
                                                     <Tooltip title="Отказатся">
                                                         <IconButton
                                                             edge="end"

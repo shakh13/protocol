@@ -18,6 +18,7 @@ import {Add, Delete} from "@mui/icons-material";
 import NoData from "../../components/NoData.jsx";
 import dayjs from "dayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Swal from "sweetalert2";
 
 
 export default function CreatePage() {
@@ -61,7 +62,10 @@ export default function CreatePage() {
                 setBuildings(b);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
 
         AxiosInstance.get("protocol-types/")
@@ -77,7 +81,10 @@ export default function CreatePage() {
                 setProtocolTypes(pt);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
 
         AxiosInstance.get("machines/")
@@ -93,7 +100,10 @@ export default function CreatePage() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -173,27 +183,15 @@ export default function CreatePage() {
         name: "machines",
     });
 
+    const onError = (errors) => {
+        Swal.fire({
+            title: 'Заполните все поля',
+            icon: "error",
+        });
+        // console.log('❌ Form errors:', errors);
+    };
+
     const onSubmit = (data) => {
-        // console.log(data, selectedProtocol);
-        // let protocol = {};
-        // if (!selectedProtocol.settings.isEmpty)
-        //     selectedProtocol.settings['fields'].map((field) => {
-        //         field.map((col) => {
-        //             if (col['type'] !== 'i' && col['type'] !== 'text') {
-        //                 if (col['type'] === 'date_field') {
-        //                     protocol[col.name] = dayjs(data[col.name]).format("YYYY-MM-DD")
-        //                 } else {
-        //                     protocol[col.name] = data[col.name]
-        //                 }
-        //             }
-        //         });
-        //     });
-
-        console.log(data)
-        // data.data.map((d) => {
-        //     console.log(d)
-        // })
-
         let m = [];
         data.machines.map((machine) => {
             m.push(machine.value.value);
@@ -237,7 +235,10 @@ export default function CreatePage() {
                 }
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -398,7 +399,7 @@ export default function CreatePage() {
             <Box sx={{marginTop: '15px'}}>
                 {loading
                     ? <Waiting/>
-                    : <form onSubmit={handleSubmit(onSubmit)}>
+                    : <form onSubmit={handleSubmit(onSubmit, onError)}>
                         <Box>
                             <MySelectField
                                 name="client"

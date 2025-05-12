@@ -17,6 +17,7 @@ import * as React from "react";
 import DeleteProtocol from "../personal/protocol/delete_protocol.jsx";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Swal from "sweetalert2";
 
 export default function AdminProtocols(props) {
     const [protocols, setProtocols] = useState([]);
@@ -37,7 +38,10 @@ export default function AdminProtocols(props) {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

@@ -16,6 +16,7 @@ import AxiosInstance from "../../../components/axios_instance.jsx";
 import Waiting from "../../../components/Waiting.jsx";
 import * as yup from "yup";
 import {yupResolver} from "@hookform/resolvers/yup";
+import Swal from "sweetalert2";
 
 export default function AddEmployee(props) {
     const {open, setOpen, updateData} = props;
@@ -38,7 +39,10 @@ export default function AddEmployee(props) {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             })
     }
 
@@ -83,7 +87,10 @@ export default function AddEmployee(props) {
                 window.location.href = '/admin/employee/' + response.data.id;
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setOpen(false);
             });
     };

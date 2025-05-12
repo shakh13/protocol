@@ -17,6 +17,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import AxiosInstance from "../../../components/axios_instance.jsx";
 import dayjs from "dayjs";
 import ErrorMessage from "../../../components/ErrorMessage.jsx";
+import Swal from "sweetalert2";
 
 
 export default function EditClient(props) {
@@ -35,7 +36,10 @@ export default function EditClient(props) {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setLoading(true);
             });
     }
@@ -67,7 +71,10 @@ export default function EditClient(props) {
             })
             .catch((error) => {
                 setEditError(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     };
     const handleClose = () => {

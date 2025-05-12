@@ -13,6 +13,7 @@ import {useForm} from "react-hook-form";
 import * as yup from "yup";
 import {yupResolver} from "@hookform/resolvers/yup";
 import AxiosInstance from "../../../components/axios_instance.jsx";
+import Swal from "sweetalert2";
 
 
 export default function AddBuilding(props) {
@@ -46,7 +47,10 @@ export default function AddBuilding(props) {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setOpen(false);
             });
     };

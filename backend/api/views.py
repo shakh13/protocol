@@ -892,10 +892,16 @@ class Me(APIView):
         laboratory = LaboratorySerializer(user.laboratory)
 
         # Get clients related to the current user
-        clients = ClientSerializer(user.clients.all(), many=True).data
+        if user.is_superuser:
+            clients = ClientSerializer(Client.objects.filter(laboratory=user.laboratory), many=True).data
+        else:
+            clients = ClientSerializer(user.clients.all(), many=True).data
 
         # Get buildings where user is assigned
-        buildings = BuildingSerializer(Building.objects.filter(user=user), many=True).data
+        if user.is_superuser:
+            buildings = BuildingSerializer(Building.objects.filter(laboratory=user.laboratory), many=True).data
+        else:
+            buildings = BuildingSerializer(Building.objects.filter(user=user), many=True).data
 
         # Protocols
         protocols = ProtocolSerializer(Protocol.objects.filter(user=user).order_by("-id"), many=True).data

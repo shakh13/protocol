@@ -14,6 +14,7 @@ import AxiosInstance from "../../../components/axios_instance.jsx";
 import Waiting from "../../../components/Waiting.jsx";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import Swal from "sweetalert2";
 
 export default function EditCertificate(props) {
     const {open, setOpen, id, updateData} = props;
@@ -55,7 +56,10 @@ export default function EditCertificate(props) {
             setOpen(false);
             updateData();
         }).catch((error) => {
-            console.log(error);
+            Swal.fire({
+                title: error,
+                icon: "error",
+            });
         });
     };
     const handleClose = () => {

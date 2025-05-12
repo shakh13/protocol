@@ -15,6 +15,7 @@ import * as yup from "yup";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {useEffect, useState} from "react";
 import AxiosInstance from "../../../components/axios_instance.jsx";
+import Swal from "sweetalert2";
 
 const options = [
     {value: 'chocolate', label: 'Chocolate'},
@@ -42,7 +43,10 @@ export default function EditEmployee(props) {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             })
 
         AxiosInstance.get("users/" + id)
@@ -58,7 +62,10 @@ export default function EditEmployee(props) {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -101,8 +108,10 @@ export default function EditEmployee(props) {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
-                setOpen(false);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             })
     };
     const handleClose = () => {

@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import DialogContentText from "@mui/material/DialogContentText";
 import AxiosInstance from "../../../components/axios_instance.jsx";
 import Waiting from "../../../components/Waiting.jsx";
+import Swal from "sweetalert2";
 
 export default function DeleteBuilding(props) {
     const {open, setOpen, id, updateData} = props;
@@ -23,7 +24,10 @@ export default function DeleteBuilding(props) {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -39,7 +43,10 @@ export default function DeleteBuilding(props) {
             })
             .catch((error) => {
                 setOpen(false);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             })
     }
 

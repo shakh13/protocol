@@ -24,6 +24,7 @@ import Waiting from "../../components/Waiting.jsx";
 import NoData from "../../components/NoData.jsx";
 import MySearchField from "../../components/forms/MySearchField.jsx";
 import MyAvatar from "../../components/MyAvatar.jsx";
+import Swal from "sweetalert2";
 
 
 function generate(element) {
@@ -54,7 +55,10 @@ export default function AdminEmployees() {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

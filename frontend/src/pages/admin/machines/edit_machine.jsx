@@ -19,6 +19,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import Box from "@mui/material/Box";
 import Waiting from "../../../components/Waiting.jsx";
 import ErrorMessage from "../../../components/ErrorMessage.jsx";
+import Swal from "sweetalert2";
 
 export default function EditMachine(props) {
     const {open, setOpen, id, updateData} = props;
@@ -40,7 +41,10 @@ export default function EditMachine(props) {
             });
             setCertificates(certs);
         }).catch((error) => {
-            console.log(error);
+            Swal.fire({
+                title: error,
+                icon: "error",
+            });
         });
 
         AxiosInstance.get("machines/" + id)
@@ -55,7 +59,10 @@ export default function EditMachine(props) {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setLoading(true);
             });
     }
@@ -99,7 +106,10 @@ export default function EditMachine(props) {
             })
             .catch((error) => {
                 setEditError(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     };
     const handleClose = () => {

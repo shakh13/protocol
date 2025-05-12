@@ -16,6 +16,7 @@ import AxiosInstance from "../../components/axios_instance.jsx";
 import dayjs from "dayjs";
 import NoData from "../../components/NoData.jsx";
 import Waiting from "../../components/Waiting.jsx";
+import Swal from "sweetalert2";
 
 
 export default function AdminMachines() {
@@ -36,7 +37,10 @@ export default function AdminMachines() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

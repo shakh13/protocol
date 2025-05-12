@@ -37,6 +37,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import DeleteProtocol from "../personal/protocol/delete_protocol.jsx";
+import Swal from "sweetalert2";
 
 function generate(element) {
     return [0, 1, 2, 3, 4].map((value) =>
@@ -77,8 +78,11 @@ export default function AdminClient() {
                 setLoading(false);
             })
             .catch((error) => {
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setLoading(true);
-                console.log(error);
             });
     }
 

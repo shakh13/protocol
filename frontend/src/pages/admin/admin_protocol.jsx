@@ -11,6 +11,7 @@ import Link from "@mui/material/Link";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import Grid from "@mui/material/Grid2";
 import EditProtocol from "../personal/protocol/edit_protocol.jsx";
+import Swal from "sweetalert2";
 
 export default function AdminProtocol() {
     const {id} = useParams();
@@ -23,11 +24,13 @@ export default function AdminProtocol() {
         setLoading(true);
         AxiosInstance.get("protocol/" + id)
             .then((response) => {
-                console.log(response.data);
                 setProtocol(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
 
         AxiosInstance.get("machines/")
@@ -43,7 +46,10 @@ export default function AdminProtocol() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

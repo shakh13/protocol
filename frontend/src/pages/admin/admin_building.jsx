@@ -17,6 +17,7 @@ import TableBody from "@mui/material/TableBody";
 import Link from "@mui/material/Link";
 import {Close, Done} from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Swal from "sweetalert2";
 
 export default function AdminBuilding() {
     const {id} = useParams();
@@ -31,7 +32,10 @@ export default function AdminBuilding() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

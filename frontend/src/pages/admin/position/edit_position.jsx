@@ -13,6 +13,7 @@ import {useForm} from "react-hook-form";
 import AxiosInstance from "../../../components/axios_instance.jsx";
 import * as yup from "yup";
 import {yupResolver} from "@hookform/resolvers/yup";
+import Swal from "sweetalert2";
 
 
 export default function EditPosition(props) {
@@ -30,7 +31,10 @@ export default function EditPosition(props) {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -66,7 +70,10 @@ export default function EditPosition(props) {
             })
             .catch((error) => {
                 setEditError(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     };
     const handleClose = () => {

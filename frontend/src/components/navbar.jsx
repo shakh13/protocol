@@ -174,6 +174,7 @@ export default function Navbar(props) {
                              authentication={authentication}
                 >
                     <DashboardLayout
+                        defaultSidebarCollapsed
                         slots={{
                             // appTitle: CustomAppTitle,
                         }}

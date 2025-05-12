@@ -16,6 +16,7 @@ import {uploadFile} from "../../components/axios_instance.jsx"
 import SaveIcon from '@mui/icons-material/Save';
 import Waiting from "../../components/Waiting.jsx";
 import MyTextareaField from "../../components/forms/MyTextareaField.jsx";
+import Swal from "sweetalert2";
 
 export default function AdminSettings(props) {
     const [loading, setLoading] = useState(false);
@@ -44,7 +45,10 @@ export default function AdminSettings(props) {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -105,7 +109,10 @@ export default function AdminSettings(props) {
                         // console.log(res);
                     })
                     .catch((error) => {
-                        console.log(error);
+                        Swal.fire({
+                            title: error,
+                            icon: "error",
+                        });
                     });
             AxiosInstance.put("laboratory/" + laboratoryId + "/", {
                 name: data.name,
@@ -124,7 +131,10 @@ export default function AdminSettings(props) {
                     setSaving(false);
                 })
                 .catch((error) => {
-                    console.log(error);
+                    Swal.fire({
+                        title: error,
+                        icon: "error",
+                    });
                 })
         }
     }

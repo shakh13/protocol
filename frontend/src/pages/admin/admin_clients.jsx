@@ -15,6 +15,7 @@ import AxiosInstance from "../../components/axios_instance.jsx";
 import Waiting from "../../components/Waiting.jsx";
 import TextField from "@mui/material/TextField";
 import NoData from "../../components/NoData.jsx";
+import Swal from "sweetalert2";
 
 
 export default function AdminClients() {
@@ -37,7 +38,10 @@ export default function AdminClients() {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

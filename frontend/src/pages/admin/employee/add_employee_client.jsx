@@ -15,6 +15,7 @@ import {useEffect, useState} from "react";
 import AxiosInstance from "../../../components/axios_instance.jsx";
 import Waiting from "../../../components/Waiting.jsx";
 import MySelectField from "../../../components/forms/MySelectField.jsx";
+import Swal from "sweetalert2";
 
 export default function AddEmployeeClient(props) {
     const {employee, updateData, open, setOpen} = props;
@@ -38,7 +39,10 @@ export default function AddEmployeeClient(props) {
             })
             .catch((error) => {
                 setClientsLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -68,7 +72,10 @@ export default function AddEmployeeClient(props) {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
+import Swal from "sweetalert2";
 
 export default function ClientsPage() {
     const [user, setUser] = useState([]);
@@ -24,7 +25,10 @@ export default function ClientsPage() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

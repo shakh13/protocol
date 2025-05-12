@@ -14,6 +14,7 @@ import AxiosInstance from "../../../components/axios_instance.jsx";
 import * as yup from "yup";
 import {yupResolver} from "@hookform/resolvers/yup";
 import Waiting from "../../../components/Waiting.jsx";
+import Swal from "sweetalert2";
 
 
 export default function EditBuilding(props) {
@@ -31,7 +32,10 @@ export default function EditBuilding(props) {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setLoading(true);
             });
     }
@@ -66,7 +70,10 @@ export default function EditBuilding(props) {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
                 setOpen(false);
             })
     };

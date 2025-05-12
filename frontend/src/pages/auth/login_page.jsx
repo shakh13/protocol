@@ -105,7 +105,7 @@ export default function LoginPage() {
                 }
                 window.location.href = response.data.isAdmin ? "/admin" : "/protocols";
             }).catch((error) => {
-                console.log(error);
+                // console.log(error);
                 setShowMessage(true);
                 localStorage.clear();
             });

@@ -15,6 +15,7 @@ import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 import Link from "@mui/material/Link";
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import Swal from "sweetalert2";
 
 export default function ProtocolPage() {
     const {id} = useParams();
@@ -30,7 +31,10 @@ export default function ProtocolPage() {
                 setProtocol(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
 
         AxiosInstance.get("machines/")
@@ -46,7 +50,10 @@ export default function ProtocolPage() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -72,7 +79,7 @@ export default function ProtocolPage() {
                                 ИСПЫТАНИЙ {protocol.building?.prefix ? ` ${protocol.building.prefix}-${id}` : ` № ${id}`} от {dayjs(protocol.start_date).format('DD.MM.YYYY')}г.
                             </Typography>
 
-                            {protocol.status === 1 &&
+                            {protocol.status !== 0 &&
                                 <Tooltip title="Скачать PDF">
                                     <IconButton
                                         component={Link}

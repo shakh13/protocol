@@ -42,6 +42,7 @@ import TableBody from "@mui/material/TableBody";
 import {Close, Done} from "@mui/icons-material";
 import TableContainer from "@mui/material/TableContainer";
 import DeleteProtocol from "../personal/protocol/delete_protocol.jsx";
+import Swal from "sweetalert2";
 
 export default function AdminEmployee() {
     const {id} = useParams();
@@ -73,7 +74,10 @@ export default function AdminEmployee() {
                 setEmployee(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
 
         AxiosInstance.get(`user_protocols/${id}`)
@@ -82,7 +86,10 @@ export default function AdminEmployee() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             })
     }
 

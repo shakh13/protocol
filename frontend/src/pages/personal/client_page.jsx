@@ -22,6 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteProtocol from "./protocol/delete_protocol.jsx";
+import Swal from "sweetalert2";
 
 export default function ClientPage() {
     const {id} = useParams();
@@ -39,7 +40,10 @@ export default function ClientPage() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -56,7 +60,10 @@ export default function ClientPage() {
                 getData();
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

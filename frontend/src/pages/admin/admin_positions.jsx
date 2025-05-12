@@ -17,6 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AxiosInstance from "../../components/axios_instance.jsx";
 import Waiting from "../../components/Waiting.jsx";
 import NoData from "../../components/NoData.jsx";
+import Swal from "sweetalert2";
 
 function generate(element) {
     return [0, 1, 2, 3, 4].map((value) =>
@@ -44,7 +45,10 @@ export default function AdminPositions() {
             })
             .catch((error) => {
                 setLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 

@@ -17,6 +17,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import dayjs from "dayjs";
 import ErrorMessage from "../../../components/ErrorMessage.jsx";
+import Swal from "sweetalert2";
 
 
 // const certificates = [
@@ -42,6 +43,10 @@ export default function AddMachine(props) {
             setCertificates(cert);
             setLoading(false);
         }).catch((error) => {
+            Swal.fire({
+                title: error,
+                icon: "error",
+            });
             setLoading(true);
         })
     }
@@ -82,7 +87,10 @@ export default function AddMachine(props) {
             setOpen(false);
         }).catch((error) => {
             setAddError(true);
-            console.log(error);
+            Swal.fire({
+                title: error,
+                icon: "error",
+            });
         });
     };
 

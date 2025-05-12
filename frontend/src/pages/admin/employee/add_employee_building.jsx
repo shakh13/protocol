@@ -15,6 +15,7 @@ import {useEffect, useState} from "react";
 import AxiosInstance from "../../../components/axios_instance.jsx";
 import Waiting from "../../../components/Waiting.jsx";
 import MySelectField from "../../../components/forms/MySelectField.jsx";
+import Swal from "sweetalert2";
 
 export default function AddEmployeeBuilding(props) {
     const {employee, updateData, open, setOpen} = props;
@@ -40,7 +41,10 @@ export default function AddEmployeeBuilding(props) {
             })
             .catch((error) => {
                 setClientsLoading(true);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -67,7 +71,10 @@ export default function AddEmployeeBuilding(props) {
             client_id: data.client.value
         })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
 
         AxiosInstance.put("buildings/" + data.building.value + "/", {
@@ -78,7 +85,10 @@ export default function AddEmployeeBuilding(props) {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
@@ -103,7 +113,10 @@ export default function AddEmployeeBuilding(props) {
             .catch((error) => {
                 setBuildings([]);
                 setBuildingLoading(false);
-                console.log(error);
+                Swal.fire({
+                    title: error,
+                    icon: "error",
+                });
             });
     }
 
