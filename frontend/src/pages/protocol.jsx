@@ -7,19 +7,19 @@ import NotFoundPage from "./not_found_page.jsx";
 
 export default function Protocol() {
     const {id} = useParams();
-    const [protocol, setProtocol] = useState(null);
+    const [protocolExists, setExistsProtocol] = useState(false);
 
     function getData() {
         AxiosInstance.get("generate-pdf/" + id)
             .then((response) => {
                 if (response.status === 404) {
-                    setProtocol(null)
+                    setExistsProtocol(false)
                 } else {
-                    setProtocol(response.data);
+                    setExistsProtocol(true);
                 }
             })
             .catch((error) => {
-                setProtocol(null);
+                setExistsProtocol(false);
             })
     }
 
@@ -30,7 +30,7 @@ export default function Protocol() {
     return (
         <Box>
             {
-                protocol === null
+                protocolExists === null
                     ? <NotFoundPage/>
                     : <Box sx={{height: '100vh', overflow: 'hidden'}}>
                         <embed

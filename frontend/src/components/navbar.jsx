@@ -131,8 +131,8 @@ export default function Navbar(props) {
         colorSchemes: {
             dark: true,
             light: true,
-
         },
+        defaultColorScheme: 'light',
         colorSchemeSelector: 'class',
         breakpoints: {
             values: {
@@ -168,6 +168,7 @@ export default function Navbar(props) {
         <>
             {noNavBar ? content :
                 <AppProvider theme={theme}
+
                              branding={branding}
                              navigation={currentNavigation}
                              session={session}

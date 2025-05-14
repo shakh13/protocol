@@ -21,7 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Swal from "sweetalert2";
 
 
-export default function CreatePage() {
+export default function CreatePage(props) {
     const [user, setUser] = React.useState({});
     const [loading, setLoading] = React.useState(true);
     const [clients, setClients] = React.useState([]);

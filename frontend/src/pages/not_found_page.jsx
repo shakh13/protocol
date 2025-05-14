@@ -16,7 +16,7 @@ export default function NotFoundPage() {
         >
             <Container>
                 <Grid container spacing={2}>
-                    <Grid xs={6}>
+                    <Grid size={6}>
                         <Typography variant="h1">
                             404
                         </Typography>
@@ -31,7 +31,7 @@ export default function NotFoundPage() {
                             ← Назад
                         </Button>
                     </Grid>
-                    <Grid xs={6}>
+                    <Grid size={6}>
                         <img src="/assets/notfound.png" alt="Not Found" width={350}/>
                     </Grid>
                 </Grid>

@@ -1,0 +1,126 @@
+<html>
+<head>
+    <title>PDF Example</title>
+    <style>
+        @page {
+            size: A4;
+            margin-top: 2cm;
+            margin-bottom: 4cm;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 10px;
+            border-bottom: 1px solid #000;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            border-top: 1px solid #000;
+            padding: 10px;
+        }
+
+        /* Page Numbering */
+        .pagenumber {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .content {
+            margin-top: 4cm; /* Prevent content from overlapping header */
+            margin-bottom: 3cm; /* Prevent content from overlapping footer */
+        }
+    </style>
+</head>
+<body>
+<!-- Header (Repeats on Every Page) -->
+<div class="header">Report Title</div>
+<!-- Page Numbering (Repeats on Every Page) -->
+<div class="pagenumber" style="page-break-before: always;">
+    <pdf:pagenumber/>
+    /
+    <pdf:pagecount/>
+</div>
+
+<div class="content">
+    <h1>My XHTML2PDF Report</h1>
+    <p>This is the main content of the document.</p>
+    <p style="page-break-before: always;">This is a new page.</p>
+</div>
+
+<!-- Footer (Repeats on Every Page) -->
+<div class="footer">
+    <p>Confidential Report</p>
+</div>
+
+
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+<pre>a</pre>
+
+</body>
+</html>

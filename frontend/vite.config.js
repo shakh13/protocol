@@ -11,5 +11,9 @@ export default defineConfig({
     },
     optimizeDeps: {
         include: ['react-to-pdf'],
-    }
+    },
+    build: {
+        chunkSizeWarningLimit: 5000, // in kB
+    },
+    base: '/',
 })

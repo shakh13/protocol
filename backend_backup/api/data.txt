@@ -1,0 +1,7 @@
+{
+"first_name": "Shaxzod",
+"last_name": "Saidmurodov",
+"email": "shakh@gmail.com",
+"password": "shakh123",
+"position": 2
+}

@@ -116,39 +116,10 @@ PROTOCOL_STATUS = [
     (3, 'REJECTED'),
 ]
 
-PROTOCOL_TYPES = [
-    (0, 'Бетон 08'),
-    (1, 'Бетон 1.28'),
-    (2, 'Грунт, плот'),
-    (3, 'Грунт, куп'),
-    (4, 'ГПС, плот'),
-    (5, 'ГПС, куп'),
-    (6, 'Оникс, Шмидт 08'),
-    (7, 'Оникс, Шмидт 1.28'),
-    (8, 'Щебень'),
-    (9, 'Песок'),
-    (10, 'Цемент'),
-    (11, 'ГПС, ШПС'),
-    (12, 'Макс. плотность'),
-    (13, 'ПЛТ'),
+PROTOCOL_LANGUAGE = [
+    ('ru', 'Русский'),
+    ('en', 'Английский'),
 ]
-
-PROTOCOL_SETTINGS = {
-    0: Beton08PDF.settings(),
-    1: Beton08PDF.settings(),
-    2: Beton08PDF.settings(),
-    3: Beton08PDF.settings(),
-    4: Beton08PDF.settings(),
-    5: Beton08PDF.settings(),
-    6: Beton08PDF.settings(),
-    7: Beton08PDF.settings(),
-    8: Beton08PDF.settings(),
-    9: Beton08PDF.settings(),
-    10: Beton08PDF.settings(),
-    11: Beton08PDF.settings(),
-    12: Beton08PDF.settings(),
-    13: Beton08PDF.settings(),
-}
 
 
 class ProtocolType(models.Model):
@@ -170,7 +141,7 @@ class Protocol(models.Model):
     building = models.ForeignKey(Building, on_delete=models.SET_NULL, null=True, blank=True)
     type = models.ForeignKey(ProtocolType, on_delete=models.CASCADE)
     machines = models.ManyToManyField(Machines, blank=True)
-    language = models.CharField(max_length=2, default='ru', blank=True)
+    language = models.CharField(max_length=2, default='ru', blank=True, choices=PROTOCOL_LANGUAGE)
     # add additional fields
     product_name = models.CharField(max_length=100, null=True, blank=True)
     product_name_eng = models.CharField(max_length=100, null=True, blank=True)

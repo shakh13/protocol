@@ -33,6 +33,8 @@ export default function App() {
         || location.pathname.includes("password")
         || location.pathname.startsWith("/protocol-pdf");
 
+    // console.log(location.pathname);
+
     return (
         <>
             <Navbar noNavBar={noNavBar} content={

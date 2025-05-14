@@ -43,8 +43,6 @@ from django.utils.html import strip_tags
 import os
 from django.conf import settings
 
-from .models import PROTOCOL_TYPES
-
 import io
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, PageTemplate
@@ -91,7 +89,9 @@ def qr_generator(data):
 
 @api_view(['GET'])
 def generate_protocol_pdf(request, pk):
-    p = Protocol.objects.get(pk=pk)
+    p = get_object_or_404(Protocol, pk=pk)
+    # p = Protocol.objects.get(pk=pk)
+
     if not p or p.status == 0:  # Check if exists or completed
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
