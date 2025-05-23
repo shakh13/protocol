@@ -109,12 +109,12 @@ def generate_protocol_pdf(request, pk):
             self.set_y(-17)
             self.set_font('dejavu', 'I', 10)
 
-            start_date = datetime.strptime(protocol['start_date'], "%Y-%m-%d").strftime("%d.%m.%Y")
+            end_date = datetime.strptime(protocol['end_date'], "%Y-%m-%d").strftime("%d.%m.%Y")
 
             self.cell(
                 0,
                 5,
-                f'Протокол испытаний № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {start_date} г.',
+                f'Протокол испытаний № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {end_date} г.',
                 ln=1,
                 align='C'
             )
@@ -131,7 +131,7 @@ def generate_protocol_pdf(request, pk):
     pdf = PDF(orientation='p', unit='mm', format='A4')
 
     pdf.alias_nb_pages()
-    pdf.title = f'Протокол № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]}'
+    pdf.title = f'Протокол № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["building_protocol_number"]}'
     pdf.set_auto_page_break(auto=True, margin=18)
     pdf.add_page()
 
@@ -197,11 +197,11 @@ def generate_protocol_pdf(request, pk):
 
     pdf.set_font("dejavu", "B", 10)
     pdf.cell(0, 10,
-             f'ПРОТОКОЛ ИСПЫТАНИЙ № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {datetime.strptime(protocol["start_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г.',
+             f'ПРОТОКОЛ ИСПЫТАНИЙ № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["building_protocol_number"]} от {datetime.strptime(protocol["end_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} г.',
              align='C', ln=1)
     if protocol['language'] == 'en':
         pdf.cell(0, 0,
-                 f'TEST REPORT № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["id"]} от {datetime.strptime(protocol["start_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} y.',
+                 f'TEST REPORT № {protocol["building"]["prefix"] + " - " if protocol["building"] else ""}{protocol["building_protocol_number"]} от {datetime.strptime(protocol["end_date"], "%Y-%m-%d").strftime("%d.%m.%Y")} y.',
                  align='C', ln=True)
         pdf.ln(5)
     if protocol['language'] == 'en':
@@ -456,7 +456,10 @@ def generate_protocol_pdf(request, pk):
     TABLE_DATA = [
         [
             f"Испытатель{' / Tester' if protocol['language'] == 'en' else ''}",
-            f"{protocol['user']['position']['name']} - {protocol['user']['fullname']}\n{protocol['user']['position']['name_en']} - {protocol['user']['fullname']}"
+            f"{protocol['user']['position']['name']} - {protocol['user']['fullname']}"
+            + (
+                f"\n{protocol['user']['position']['name_en']} - {protocol['user']['fullname']}" if protocol[
+                                                                                                       'language'] == 'en' else "")
         ],
     ]
 
@@ -602,7 +605,11 @@ class BuildingViewSet(viewsets.ModelViewSet):
         else:
             queryset = Building.objects.filter(user=user)
 
-        building = get_object_or_404(queryset, pk=self.kwargs['pk'])
+        # print(building)
+
+        # building = get_object_or_404(queryset, pk=self.kwargs['pk'])
+        building = Building.objects.get(pk=self.kwargs['pk'])
+
         if user.is_superuser:
             protocols = ProtocolSerializer(Protocol.objects.filter(building=building).order_by('-id'), many=True)
         else:

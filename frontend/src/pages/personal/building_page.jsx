@@ -36,8 +36,8 @@ export default function BuildingPage() {
         setLoading(true);
         AxiosInstance.get("buildings/" + id)
             .then((response) => {
+                // console.log(response.data);
                 setBuilding(response.data);
-                console.log(response.data);
                 setLoading(false);
             })
             .catch((error) => {
@@ -189,8 +189,8 @@ export default function BuildingPage() {
                                                                 <Link href={"/protocol/" + protocol.id} underline="none">
                                                                     {
                                                                         protocol.building
-                                                                            ? protocol.building.prefix + ' - ' + protocol.id
-                                                                            : protocol.id
+                                                                            ? protocol.building.prefix + ' - ' + protocol.building_protocol_number
+                                                                            : protocol.building_protocol_number
                                                                     }
                                                                 </Link>
                                                             </TableCell>

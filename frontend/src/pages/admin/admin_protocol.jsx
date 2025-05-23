@@ -71,7 +71,7 @@ export default function AdminProtocol() {
                             component="div"
                         >
                             ПРОТОКОЛ
-                            ИСПЫТАНИЙ {protocol.building?.prefix ? ` ${protocol.building.prefix}-${id}` : ` № ${id}`} от {dayjs(protocol.start_date).format('DD.MM.YYYY')}г.
+                            ИСПЫТАНИЙ {protocol.building?.prefix ? ` ${protocol.building.prefix}-${protocol.building_protocol_number}` : ` № ${protocol.building_protocol_number}`} от {dayjs(protocol.end_date).format('DD.MM.YYYY')}г.
                         </Typography>
 
                         {protocol.status === 1 &&

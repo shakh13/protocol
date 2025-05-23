@@ -97,6 +97,7 @@ export default function AddEmployeeClient(props) {
                 display: 'flex',
                 flexDirection: 'column',
                 height: '100%',
+                minWidth: '500px',
             }}>
                 <DialogTitle id="responsive-dialog-title">
                     {"Добавить заказчик"}

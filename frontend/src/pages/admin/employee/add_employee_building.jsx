@@ -133,10 +133,11 @@ export default function AddEmployeeBuilding(props) {
             aria-describedby="scroll-dialog-description"
             aria-labelledby="responsive-dialog-title"
         >
-            <Container maxWidth="sm" sx={{
+            <Container maxWidth="xs" sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 height: '100%',
+                minWidth: '500px',
             }}>
                 <DialogTitle id="responsive-dialog-title">
                     {"Добавить объект"}

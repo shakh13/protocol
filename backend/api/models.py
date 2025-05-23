@@ -135,6 +135,7 @@ class ProtocolType(models.Model):
 
 class Protocol(models.Model):
     id = models.AutoField(primary_key=True)
+    building_protocol_number = models.PositiveIntegerField(null=True, blank=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -169,6 +170,21 @@ class Protocol(models.Model):
 
     data = models.TextField()
     status = models.IntegerField(choices=PROTOCOL_STATUS)
+
+    def save(self, *args, **kwargs):
+        if self.building_protocol_number is None:
+            if self.building:
+                last_number = (
+                        Protocol.objects.filter(building=self.building)
+                        .aggregate(models.Max('building_protocol_number'))['building_protocol_number__max'] or 0
+                )
+            else:
+                last_number = (
+                        Protocol.objects.filter(building__isnull=True)
+                        .aggregate(models.Max('building_protocol_number'))['building_protocol_number__max'] or 0
+                )
+            self.building_protocol_number = last_number + 1
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.product_name} - {self.type}'

@@ -78,8 +78,8 @@ export default function AdminProtocols(props) {
                                                     <Link href={"/admin/protocol/" + protocol.id} underline="none">
                                                         {
                                                             protocol.building
-                                                                ? protocol.building.prefix + ' - ' + protocol.id
-                                                                : protocol.id
+                                                                ? protocol.building.prefix + ' - ' + protocol.building_protocol_number
+                                                                : protocol.building_protocol_number
                                                         }
                                                     </Link>
                                                 </TableCell>
