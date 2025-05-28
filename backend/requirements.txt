@@ -1,5 +1,5 @@
 arabic-reshaper==3.0.0
-asgiref @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_47jggogimk/croot/asgiref_1724072471856/work
+asgiref
 asn1crypto==1.5.1
 Brotli==1.1.0
 certifi==2025.1.31
@@ -10,7 +10,7 @@ click==8.1.8
 cryptography==44.0.2
 cssselect2==0.8.0
 defusedxml==0.7.1
-Django @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_578q9wrure/croot/django_1731615969522/work
+Django
 django-cors-headers==4.7.0
 django-rest-knox==5.0.2
 django-rest-passwordreset==1.5.0
@@ -38,7 +38,7 @@ qrcode-styled==0.2.2
 reportlab==4.3.1
 requests==2.32.3
 six==1.17.0
-sqlparse @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_444946bpsc/croot/sqlparse_1734704466504/work
+sqlparse
 svglib==1.5.1
 tinycss2==1.4.0
 tinyhtml5==2.0.0

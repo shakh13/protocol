@@ -307,7 +307,7 @@ export default function ViewProtocol(props) {
                 </Box>
             }
 
-            {protocol.note.length > 0 &&
+            {protocol.note &&
                 <>
                     <Typography
                         variant="body1"

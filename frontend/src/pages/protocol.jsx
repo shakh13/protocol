@@ -30,11 +30,11 @@ export default function Protocol() {
     return (
         <Box>
             {
-                protocolExists === null
+                protocolExists === false
                     ? <NotFoundPage/>
                     : <Box sx={{height: '100vh', overflow: 'hidden'}}>
                         <embed
-                            src={"http://localhost:8000/generate-pdf/" + id}
+                            src={"http://rtc-test.uz:8000/generate-pdf/" + id}
                             type="application/pdf"
                             width="100%"
                             height="100%"
