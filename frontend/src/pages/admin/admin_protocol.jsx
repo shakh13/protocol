@@ -126,6 +126,12 @@ export default function AdminProtocol() {
                         <Grid size={9} p={1}>
                             {protocol.type?.name}
                         </Grid>
+                        <Grid size={3} p={1}>
+                            Испытатель
+                        </Grid>
+                        <Grid size={9} p={1}>
+                            {protocol.tester}
+                        </Grid>
                     </Grid>
                     {Object.keys(protocol).length > 0 &&
                         <EditProtocol

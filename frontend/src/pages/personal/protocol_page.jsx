@@ -131,6 +131,12 @@ export default function ProtocolPage() {
                             <Grid size={9} p={1}>
                                 {protocol.type?.name}
                             </Grid>
+                            <Grid size={3} p={1}>
+                                Испытатель
+                            </Grid>
+                            <Grid size={9} p={1}>
+                                {protocol.tester}
+                            </Grid>
 
                         </Grid>
                         {

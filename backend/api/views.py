@@ -466,13 +466,22 @@ def generate_protocol_pdf(request, pk):
 
             pdf.ln(5)
 
+        # TABLE_DATA = [
+        #     [
+        #         f"Испытатель{' / Tester' if protocol['language'] == 'en' else ''}",
+        #         f"{protocol['user']['position']['name']} - {protocol['user']['fullname']}"
+        #         + (
+        #             f"\n{protocol['user']['position']['name_en']} - {protocol['user']['fullname']}" if protocol[
+        #                                                                                                    'language'] == 'en' else "")
+        #     ],
+        # ]
+
         TABLE_DATA = [
             [
                 f"Испытатель{' / Tester' if protocol['language'] == 'en' else ''}",
-                f"{protocol['user']['position']['name']} - {protocol['user']['fullname']}"
+                f"{protocol['tester']}"
                 + (
-                    f"\n{protocol['user']['position']['name_en']} - {protocol['user']['fullname']}" if protocol[
-                                                                                                           'language'] == 'en' else "")
+                    f"\n{protocol['tester_en']}" if protocol['language'] == 'en' else "")
             ],
         ]
 

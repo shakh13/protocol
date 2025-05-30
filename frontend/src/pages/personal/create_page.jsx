@@ -132,6 +132,8 @@ export default function CreatePage(props) {
             machines: yup.array().of(yup.object().shape({
                 value: yup.object().required("Выберите прибор"),
             })),
+            building_protocol_number: yup.number().required('Введите номер протокола'),
+            tester: yup.string().required('Введите имя истытателя'),
         });
     }
 
@@ -164,6 +166,10 @@ export default function CreatePage(props) {
             machines: yup.array().of(yup.object().shape({
                 value: yup.object().required("Выберите прибор"),
             })),
+            building_protocol_number: yup.number().required('Введите номер протокола'),
+            tester: yup.string().required('Введите имя истытателя'),
+            tester_en: yup.string().required('Введите имя истытателя'),
+
         });
     };
 
@@ -203,6 +209,9 @@ export default function CreatePage(props) {
             type_id: data.protocol_type.value,
             protocol: data.data,
             machines: m,
+            tester: data.tester,
+            tester_en: data.tester_en,
+            building_protocol_number: data.building_protocol_number,
             note: data.note,
             product_name: data.product_name,
             product_name_eng: data.product_name_eng,
@@ -446,6 +455,25 @@ export default function CreatePage(props) {
                                 }}
                                 control={control}
                             />
+                            <MyTextField
+                                name={"building_protocol_number"}
+                                label={"Номер протокола"}
+                                control={control}
+                            />
+                            <MyTextField
+                                name={"tester"}
+                                label={"Испытатель"}
+                                control={control}
+                            />
+                            {
+                                selectedLang === 'en' && (
+                                    <MyTextField
+                                        name={"tester_en"}
+                                        label={"Tester"}
+                                        control={control}
+                                    />
+                                )
+                            }
                             {
                                 (selectedProtocol !== null)
                                     ? <Box>
