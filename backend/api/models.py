@@ -135,7 +135,7 @@ class ProtocolType(models.Model):
 
 class Protocol(models.Model):
     id = models.AutoField(primary_key=True)
-    building_protocol_number = models.PositiveIntegerField(null=True, blank=True)
+    building_protocol_number = models.CharField(max_length=15, null=True, blank=True)
     tester = models.CharField(max_length=200)
     tester_en = models.CharField(max_length=200, null=True, blank=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE)

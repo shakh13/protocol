@@ -116,6 +116,7 @@ export default function EditProtocol(props) {
         loadProtocolData();
 
         setSelectedLang(protocol.language);
+        
         setValue("machines", (protocol.machines || []).map((machine) => {
             return {
                 value: {

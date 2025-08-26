@@ -24,6 +24,7 @@ export default function AdminProtocol() {
         setLoading(true);
         AxiosInstance.get("protocol/" + id)
             .then((response) => {
+
                 setProtocol(response.data);
             })
             .catch((error) => {

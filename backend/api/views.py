@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.template.defaultfilters import slice_filter
 from datetime import datetime
 from knox.serializers import UserSerializer
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model, authenticate
 from knox.models import AuthToken
@@ -169,13 +169,6 @@ def generate_protocol_pdf(request, pk):
             row.cell("E-mail:", style=style)
             row.cell(protocol['laboratory']['email'])
 
-        my_y = pdf.y
-
-        image_field = p.laboratory.print
-        pdf.image(image_field.path, 128, 15, 40, 40, keep_aspect_ratio=True)
-
-        pdf.set_y(my_y)
-
         pdf.ln(4)
 
         with pdf.table(first_row_as_headings=False,
@@ -191,6 +184,14 @@ def generate_protocol_pdf(request, pk):
                    protocol['laboratory']['boss_en'] if
                    protocol['language'] == 'en' else '')
             )
+
+        my_y = pdf.y
+
+        image_field = p.laboratory.print
+        pdf.image(image_field.path, 163, my_y - 10, 38, 38, keep_aspect_ratio=True)
+
+        pdf.set_y(my_y)
+
         pdf.ln(4)
 
         style = FontFace(fill_color=(245, 245, 245), emphasis="B", size_pt=9)
@@ -536,6 +537,7 @@ class LaboratoryViewSet(viewsets.ModelViewSet):
     queryset = Laboratory.objects.all()
     serializer_class = LaboratorySerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         return Laboratory.objects.filter(id=self.request.user.laboratory.id)
@@ -573,6 +575,7 @@ class LaboratoryViewSet(viewsets.ModelViewSet):
 class PositionViewSet(viewsets.ModelViewSet):
     serializer_class = PositionSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -614,6 +617,7 @@ class PositionViewSet(viewsets.ModelViewSet):
 class BuildingViewSet(viewsets.ModelViewSet):
     serializer_class = BuildingSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -686,6 +690,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.prefetch_related("buildings").all()
     serializer_class = ClientSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -741,6 +746,7 @@ class ClientViewSet(viewsets.ModelViewSet):
 class MachineViewSet(viewsets.ModelViewSet):
     serializer_class = MachinesSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -787,6 +793,7 @@ class MachineViewSet(viewsets.ModelViewSet):
 class CertificateViewSet(viewsets.ModelViewSet):
     serializer_class = CertificateSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -829,6 +836,7 @@ class UserViewSet(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    pagination_class = None
 
     def retrieve(self, request, pk=None):
         user = get_object_or_404(User, pk=pk)
@@ -922,20 +930,30 @@ class Me(APIView):
         # Serialize laboratory
         laboratory = LaboratorySerializer(user.laboratory)
 
+        clients_count = 0
         # Get clients related to the current user
         if user.is_superuser:
-            clients = ClientSerializer(Client.objects.filter(laboratory=user.laboratory), many=True).data
+            c = Client.objects.filter(laboratory=user.laboratory)
+            clients_count = len(c)
+            clients = ClientSerializer(c, many=True).data
         else:
-            clients = ClientSerializer(user.clients.all(), many=True).data
+            c = user.clients.all()
+            clients_count = len(c)
+            clients = ClientSerializer(c, many=True).data
 
-        # Get buildings where user is assigned
+        buildings_count = 0
         if user.is_superuser:
-            buildings = BuildingSerializer(Building.objects.filter(laboratory=user.laboratory), many=True).data
+            b = Building.objects.filter(laboratory=user.laboratory)
+            buildings_count = len(b)
+            buildings = BuildingSerializer(b, many=True).data
         else:
-            buildings = BuildingSerializer(Building.objects.filter(user=user), many=True).data
+            b = Building.objects.filter(user=user)
+            buildings_count = len(b)
+            buildings = BuildingSerializer(b, many=True).data
 
-        # Protocols
-        protocols = ProtocolSerializer(Protocol.objects.filter(user=user).order_by("-id"), many=True).data
+        protocols_count = 0
+        p = Protocol.objects.filter(user=user).order_by("-id")
+        protocols = ProtocolSerializer(p, many=True).data
 
         return Response({
             'id': user.id,
@@ -943,15 +961,19 @@ class Me(APIView):
             'fullname': f"{user.first_name} {user.last_name}".strip(),
             'email': user.email,
             'isAdmin': user.is_superuser,
+            'clients_count': clients_count,
             'clients': clients,  # List of clients
             'buildings': buildings,
+            'buildings_count': buildings_count,
             'protocols': protocols,
+            'protocols_count': protocols_count,
         })
 
 
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
+    pagination_class = None
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -979,6 +1001,7 @@ class LoginViewSet(viewsets.ViewSet):
 class RegisterViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = RegisterSerializer
+    pagination_class = None
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data, context={"request": request})  # Pass request in context
@@ -1038,9 +1061,13 @@ def add_protocol(request):
     request.data['data'] = json.dumps(protocol)
     request.data['status'] = 0
 
+    machine_ids = request.data.pop('machines', None)
+
     serializer = ProtocolSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        protocol_instance = serializer.save()
+        if machine_ids is not None:
+            protocol_instance.machines.set(machine_ids)
         return Response(serializer.data, status=201)
 
     print(serializer.errors)
@@ -1126,8 +1153,23 @@ def get_user_protocols(request, pk):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+# @permission_classes([permissions.IsAuthenticated])
 def get_all_protocols(request):
-    serializer = ProtocolSerializer(Protocol.objects.filter(laboratory=request.user.laboratory).order_by('-id'),
-                                    many=True)
+    lab = Laboratory.objects.get(pk=1)
+    # p = Protocol.objects.filter(laboratory=request.user.laboratory).order_by('-id')
+
+    serializer = ProtocolSerializer(Protocol.objects.filter(laboratory=lab).order_by('-id'), many=True)
+
     return Response(serializer.data)
+
+
+class GetAllProtocols(generics.ListAPIView):
+    # queryset = Protocol.objects.filter(laboratory=Laboratory.objects.get(pk=1)).order_by('-id')
+    serializer_class = ProtocolSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, "laboratory") and user.laboratory:
+            return Protocol.objects.filter(laboratory=user.laboratory).order_by("-id")
+        return Protocol.objects.none()  # return empty if no lab

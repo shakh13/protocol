@@ -56,7 +56,7 @@ export default function App() {
                         <Route path="/admin/employees" element={<AdminEmployees/>}/>
                         <Route path="/admin/employee/:id" element={<AdminEmployee/>}/>
                         <Route path="/admin/positions" element={<AdminPositions/>}/>
-                        <Route path="/admin/protocols" element={<AdminProtocols/>}/>
+                        <Route path="/admin/protocols/:page_number?" element={<AdminProtocols/>}/>
                         <Route path="/admin/protocol/:id" element={<AdminProtocol/>}/>
                         <Route path="/admin/clients" element={<AdminClients/>}/>
                         <Route path="/admin/client/:id" element={<AdminClient/>}/>

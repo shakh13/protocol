@@ -27,9 +27,10 @@ export default function ProtocolsPage() {
     const [openDelete, setOpenDelete] = React.useState(false);
     const [selectedProtocol, setSelectedProtocol] = React.useState(null);
 
-    function getData() {
+    function getData(page = null) {
+        let pn = page ? '?page=' + page : '';
         setLoading(true);
-        AxiosInstance.get("me")
+        AxiosInstance.get("me" + pn)
             .then((response) => {
                 setUser(response.data);
                 setLoading(false);
@@ -43,7 +44,7 @@ export default function ProtocolsPage() {
     }
 
     useEffect(() => {
-        getData();
+        getData(null);
     }, []);
 
     const handleDeleteProtocol = (protocol) => () => {
@@ -186,16 +187,16 @@ export default function ProtocolsPage() {
                                                         <TableCell>{protocol.building?.name}</TableCell>
                                                         <TableCell>
                                                             {action}
-                                                            <Tooltip title="Удалить">
-                                                                <IconButton
-                                                                    edge="end"
-                                                                    aria-label="Удалить"
-                                                                    sx={{marginLeft: '5px'}}
-                                                                    onClick={handleDeleteProtocol(protocol)}
-                                                                >
-                                                                    <DeleteIcon/>
-                                                                </IconButton>
-                                                            </Tooltip>
+                                                            {/*<Tooltip title="Удалить">*/}
+                                                            {/*    <IconButton*/}
+                                                            {/*        edge="end"*/}
+                                                            {/*        aria-label="Удалить"*/}
+                                                            {/*        sx={{marginLeft: '5px'}}*/}
+                                                            {/*        onClick={handleDeleteProtocol(protocol)}*/}
+                                                            {/*    >*/}
+                                                            {/*        <DeleteIcon/>*/}
+                                                            {/*    </IconButton>*/}
+                                                            {/*</Tooltip>*/}
                                                         </TableCell>
                                                     </TableRow>
                                                 </Tooltip>

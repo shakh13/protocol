@@ -235,16 +235,16 @@ export default function ClientPage() {
                                                             <TableCell>{protocol.building?.name}</TableCell>
                                                             <TableCell>
                                                                 {action}
-                                                                <Tooltip title="Удалить">
-                                                                    <IconButton
-                                                                        edge="end"
-                                                                        aria-label="Удалить"
-                                                                        sx={{marginLeft: '5px'}}
-                                                                        onClick={handleDeleteProtocol(protocol)}
-                                                                    >
-                                                                        <DeleteIcon/>
-                                                                    </IconButton>
-                                                                </Tooltip>
+                                                                {/*<Tooltip title="Удалить">*/}
+                                                                {/*    <IconButton*/}
+                                                                {/*        edge="end"*/}
+                                                                {/*        aria-label="Удалить"*/}
+                                                                {/*        sx={{marginLeft: '5px'}}*/}
+                                                                {/*        onClick={handleDeleteProtocol(protocol)}*/}
+                                                                {/*    >*/}
+                                                                {/*        <DeleteIcon/>*/}
+                                                                {/*    </IconButton>*/}
+                                                                {/*</Tooltip>*/}
                                                             </TableCell>
                                                         </TableRow>
                                                     </Tooltip>

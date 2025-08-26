@@ -132,7 +132,7 @@ export default function CreatePage(props) {
             machines: yup.array().of(yup.object().shape({
                 value: yup.object().required("Выберите прибор"),
             })),
-            building_protocol_number: yup.number().required('Введите номер протокола'),
+            building_protocol_number: yup.string().required('Введите номер протокола'),
             tester: yup.string().required('Введите имя истытателя'),
         });
     }
@@ -166,7 +166,7 @@ export default function CreatePage(props) {
             machines: yup.array().of(yup.object().shape({
                 value: yup.object().required("Выберите прибор"),
             })),
-            building_protocol_number: yup.number().required('Введите номер протокола'),
+            building_protocol_number: yup.string().required('Введите номер протокола'),
             tester: yup.string().required('Введите имя истытателя'),
             tester_en: yup.string().required('Введите имя истытателя'),
 
@@ -205,6 +205,7 @@ export default function CreatePage(props) {
 
         AxiosInstance.post("add_protocol/", {
             client_id: data.client.value,
+            language: selectedLang,
             building_id: data.building !== null ? data.building.value : null,
             type_id: data.protocol_type.value,
             protocol: data.data,

@@ -1,4 +1,4 @@
-import {Container, IconButton, Tooltip} from "@mui/material";
+import {Container, IconButton, Pagination, Tooltip} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import AxiosInstance from "../../components/axios_instance.jsx";
@@ -18,23 +18,39 @@ import DeleteProtocol from "../personal/protocol/delete_protocol.jsx";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Swal from "sweetalert2";
+import {useParams} from "react-router-dom";
 
 export default function AdminProtocols(props) {
+    const {page_number} = useParams();
     const [protocols, setProtocols] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedProtocol, setSelectedProtocol] = React.useState(null);
+    const [protocolCount, setProtocolCount] = React.useState(0);
+    const [prevPage, setPrevPage] = React.useState(null);
+    const [nextPage, setNextPage] = React.useState(null);
 
     const handleDelete = (protocol) => () => {
         setSelectedProtocol(protocol);
         setOpenDelete(true);
     }
 
+    const handlePageChange = (event, value) => {
+        console.log(value);
+        getData(value);
+    }
 
-    function getData() {
-        AxiosInstance.get("all_protocols")
+
+    function getData(page = null) {
+
+        let pn = page ? '?page=' + page : '';
+        AxiosInstance.get("all_protocols" + pn)
             .then((response) => {
-                setProtocols(response.data);
+                // console.log(response.data);
+                setProtocolCount(response.data['count']);
+                setPrevPage(response.data['previous']);
+                setNextPage(response.data['next']);
+                setProtocols(response.data['results']);
                 setLoading(false);
             })
             .catch((error) => {
@@ -46,7 +62,7 @@ export default function AdminProtocols(props) {
     }
 
     useEffect(() => {
-        getData();
+        getData(page_number);
     }, []);
 
     return (
@@ -61,69 +77,76 @@ export default function AdminProtocols(props) {
                     : <>
                         {protocols.length === 0
                             ? <NoData/>
-                            : <TableContainer component={Paper} sx={{marginY: 2}}>
-                                <Table sx={{minWidth: 650}} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="left">Протокол</TableCell>
-                                            <TableCell align="left">Заказчик</TableCell>
-                                            <TableCell align="left">Объект</TableCell>
-                                            <TableCell align="right">Действия</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {protocols.map((protocol, index) => (
-                                            <TableRow key={protocol.id}>
-                                                <TableCell>
-                                                    <Link href={"/admin/protocol/" + protocol.id} underline="none">
-                                                        {
-                                                            protocol.building
-                                                                ? protocol.building.prefix + ' - ' + protocol.building_protocol_number
-                                                                : protocol.building_protocol_number
-                                                        }
-                                                    </Link>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Link
-                                                        href={"/admin/client/" + protocol.client.id}
-                                                        underline="none"
-                                                    >
-                                                        {protocol.client.name}
-                                                    </Link>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {protocol.building &&
+                            : <Box>
+                                <TableContainer component={Paper} sx={{marginY: 2}}>
+                                    <Table sx={{minWidth: 650}} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell align="left">Протокол</TableCell>
+                                                <TableCell align="left">Заказчик</TableCell>
+                                                <TableCell align="left">Объект</TableCell>
+                                                <TableCell align="right">Действия</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {protocols.map((protocol, index) => (
+                                                <TableRow key={protocol.id}>
+                                                    <TableCell>
+                                                        <Link href={"/admin/protocol/" + protocol.id} underline="none">
+                                                            {
+                                                                protocol.building
+                                                                    ? protocol.building.prefix + ' - ' + protocol.building_protocol_number
+                                                                    : protocol.building_protocol_number
+                                                            }
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell>
                                                         <Link
-                                                            href={"/admin/building/" + protocol.building.id}
+                                                            href={"/admin/client/" + protocol.client.id}
                                                             underline="none"
                                                         >
-                                                            {protocol.building.name}
+                                                            {protocol.client.name}
                                                         </Link>
-                                                    }
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Tooltip title="Удалить">
-                                                        <IconButton
-                                                            sx={{marginLeft: '5px'}}
-                                                            edge="end"
-                                                            variant="contained"
-                                                            onClick={handleDelete(protocol)}
-                                                        >
-                                                            <DeleteIcon/>
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {protocol.building &&
+                                                            <Link
+                                                                href={"/admin/building/" + protocol.building.id}
+                                                                underline="none"
+                                                            >
+                                                                {protocol.building.name}
+                                                            </Link>
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Tooltip title="Удалить">
+                                                            <IconButton
+                                                                sx={{marginLeft: '5px'}}
+                                                                edge="end"
+                                                                variant="contained"
+                                                                onClick={handleDelete(protocol)}
+                                                            >
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                {
+                                    protocolCount > 20 &&
+                                    <Pagination count={Math.ceil(protocolCount / 20)} page={page_number}
+                                                onChange={handlePageChange}/>
+                                }
+                            </Box>
                         }
-                        {
-                            openDelete &&
-                            <DeleteProtocol protocol={selectedProtocol} open={openDelete} setOpen={setOpenDelete}
-                                            updateData={getData}/>
-                        }
+                            {
+                                openDelete &&
+                                <DeleteProtocol protocol={selectedProtocol} open={openDelete} setOpen={setOpenDelete}
+                                                updateData={getData}/>
+                            }
                     </>
             }
         </Container>
