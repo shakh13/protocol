@@ -63,6 +63,8 @@ from fpdf.enums import Align, TableSpan
 from qrcode_styled.pil.image import PilStyledImage
 import qrcode_styled
 
+from rest_framework.pagination import PageNumberPagination
+
 
 def qr_generator(data):
     qr = qrcode_styled.QRCodeStyled(
@@ -377,12 +379,20 @@ def generate_protocol_pdf(request, pk):
                     'Дата выдачи'
                 ],
             ]
-        for machine in protocol['machines']:
+
+        machines = json.loads(protocol['saved_machines'])
+        for machine in machines:
             TABLE_DATA.append([
                 machine['name'],
-                machine['certificate_number'],
-                datetime.strptime(machine['certificate_expiry_date'], "%Y-%m-%d").strftime("%d.%m.%Y"),
+                machine['certificate'],
+                machine['expiry_date'],
             ])
+        # for machine in protocol['machines']:
+        #     TABLE_DATA.append([
+        #         machine['name'],
+        #         machine['certificate_number'],
+        #         datetime.strptime(machine['certificate_expiry_date'], "%Y-%m-%d").strftime("%d.%m.%Y"),
+        #     ])
 
         pdf.set_font("dejavu", "", 9)
         with pdf.table(
@@ -930,30 +940,25 @@ class Me(APIView):
         # Serialize laboratory
         laboratory = LaboratorySerializer(user.laboratory)
 
-        clients_count = 0
         # Get clients related to the current user
         if user.is_superuser:
-            c = Client.objects.filter(laboratory=user.laboratory)
-            clients_count = len(c)
-            clients = ClientSerializer(c, many=True).data
+            clients = ClientSerializer(Client.objects.filter(laboratory=user.laboratory), many=True).data
         else:
-            c = user.clients.all()
-            clients_count = len(c)
-            clients = ClientSerializer(c, many=True).data
+            clients = ClientSerializer(user.clients.all(), many=True).data
 
-        buildings_count = 0
         if user.is_superuser:
-            b = Building.objects.filter(laboratory=user.laboratory)
-            buildings_count = len(b)
-            buildings = BuildingSerializer(b, many=True).data
+            buildings = BuildingSerializer(Building.objects.filter(laboratory=user.laboratory), many=True).data
         else:
-            b = Building.objects.filter(user=user)
-            buildings_count = len(b)
-            buildings = BuildingSerializer(b, many=True).data
+            buildings = BuildingSerializer(Building.objects.filter(user=user), many=True).data
 
-        protocols_count = 0
-        p = Protocol.objects.filter(user=user).order_by("-id")
-        protocols = ProtocolSerializer(p, many=True).data
+        protocols_qs = Protocol.objects.filter(user=user).order_by("-id")
+        protocols_count = len(protocols_qs)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 20  # default page size
+        paginated_protocols = paginator.paginate_queryset(protocols_qs, request)
+
+        protocols = ProtocolSerializer(paginated_protocols, many=True).data
 
         return Response({
             'id': user.id,
@@ -961,10 +966,8 @@ class Me(APIView):
             'fullname': f"{user.first_name} {user.last_name}".strip(),
             'email': user.email,
             'isAdmin': user.is_superuser,
-            'clients_count': clients_count,
             'clients': clients,  # List of clients
             'buildings': buildings,
-            'buildings_count': buildings_count,
             'protocols': protocols,
             'protocols_count': protocols_count,
         })
@@ -1104,10 +1107,36 @@ def update_protocol_status(request, pk):
             ]
             request.data['data'] = json.dumps(data)
         protocol.status = request.data['status']
+        if request.data['status'] == 1:
+            saved_machines = [
+                {
+                    'name': m.name,
+                    'certificate': m.certificate_number,
+                    'expiry_date': m.certificate_expiry_date,
+                }
+                for m in protocol.machines.all()
+            ]
+            protocol.saved_machines = json.dumps(saved_machines)
+
         protocol.save()
         return Response(status=204)
     except Protocol.DoesNotExist:
         return Response(status=404)
+
+
+def update_all_protocols_machines():
+    protocols = Protocol.objects.filter(status=1)
+    for protocol in protocols:
+        saved_machines = [
+            {
+                'name': m.name,
+                'certificate': m.certificate_number,
+                'expiry_date': m.certificate_expiry_date.strftime("%d.%m.%Y"),
+            }
+            for m in protocol.machines.all()
+        ]
+        protocol.saved_machines = json.dumps(saved_machines)
+        protocol.save()
 
 
 @api_view(['PUT'])

@@ -10,9 +10,13 @@ export default function ViewProtocol(props) {
     const [settings, setSettings] = useState({});
     const [protocolHeaders, setProtocolHeaders] = useState([]);
     const [protocolData, setProtocolData] = useState([]);
+    const [machines, setMachines] = useState([]);
 
     function getData() {
         const s = JSON.parse(protocol.type.settings);
+        const m = JSON.parse(protocol.saved_machines);
+        setMachines(m);
+
         setSettings(s);
 
         if ("headers" in s) {
@@ -204,16 +208,28 @@ export default function ViewProtocol(props) {
             >
                 <Grid size={6} color={'CaptionText'} bgcolor={'ButtonShadow'}>Наименование</Grid>
                 <Grid size={3} color={'CaptionText'} bgcolor={'ButtonShadow'}>№ сертификата</Grid>
-                <Grid size={3} color={'CaptionText'} bgcolor={'ButtonShadow'}>Годен до</Grid>
+                <Grid size={3} color={'CaptionText'} bgcolor={'ButtonShadow'}>Дата выдачи</Grid>
+                {/*{*/}
+                {/*    protocol.machines.map((machine) => {*/}
+                {/*        return (*/}
+                {/*            <React.Fragment key={machine.id}>*/}
+                {/*                <Grid size={6}>{machine.name}</Grid>*/}
+                {/*                <Grid size={3}>{machine.certificate_number}</Grid>*/}
+                {/*                <Grid size={3}>{dayjs(machine.certificate_expiry_date).format('DD.MM.YYYY')}</Grid>*/}
+                {/*            </React.Fragment>*/}
+                {/*        )*/}
+                {/*    })*/}
+                {/*}*/}
+
                 {
-                    protocol.machines.map((machine) => {
+                    machines.map((machine) => {
                         return (
-                            <React.Fragment key={machine.id}>
+                            <React.Fragment key={machine.name}>
                                 <Grid size={6}>{machine.name}</Grid>
-                                <Grid size={3}>{machine.certificate_number}</Grid>
-                                <Grid size={3}>{dayjs(machine.certificate_expiry_date).format('DD.MM.YYYY')}</Grid>
+                                <Grid size={3}>{machine.certificate}</Grid>
+                                <Grid size={3}>{machine.expiry_date}</Grid>
                             </React.Fragment>
-                        )
+                        );
                     })
                 }
             </Grid>

@@ -6,7 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {Container, IconButton, Tooltip} from "@mui/material";
+import {Container, IconButton, Pagination, Tooltip} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -26,6 +26,13 @@ export default function ProtocolsPage() {
     const [loading, setLoading] = React.useState(true);
     const [openDelete, setOpenDelete] = React.useState(false);
     const [selectedProtocol, setSelectedProtocol] = React.useState(null);
+    const [protocolCount, setProtocolCount] = React.useState(0);
+    const [page, setPage] = React.useState(1);
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        getData(value);
+    }
 
     function getData(page = null) {
         let pn = page ? '?page=' + page : '';
@@ -33,6 +40,7 @@ export default function ProtocolsPage() {
         AxiosInstance.get("me" + pn)
             .then((response) => {
                 setUser(response.data);
+                setProtocolCount(response.data['protocols_count']);
                 setLoading(false);
             })
             .catch((error) => {
@@ -206,6 +214,13 @@ export default function ProtocolsPage() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        {
+                            protocolCount > 20 &&
+                            <Box sx={{display: "flex", justifyContent: "center", mt: 2}}>
+                                <Pagination count={Math.ceil(protocolCount / 20)} page={page}
+                                            onChange={handlePageChange}/>
+                            </Box>
+                        }
                         {
                             openDelete &&
                             <DeleteProtocol

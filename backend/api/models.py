@@ -144,6 +144,7 @@ class Protocol(models.Model):
     building = models.ForeignKey(Building, on_delete=models.SET_NULL, null=True, blank=True)
     type = models.ForeignKey(ProtocolType, on_delete=models.CASCADE)
     machines = models.ManyToManyField(Machines, blank=True)
+    saved_machines = models.TextField(null=True, blank=True)
     language = models.CharField(max_length=2, default='ru', blank=True, choices=PROTOCOL_LANGUAGE)
     # add additional fields
     product_name = models.CharField(max_length=100, null=True, blank=True)

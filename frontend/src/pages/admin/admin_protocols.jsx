@@ -137,16 +137,18 @@ export default function AdminProtocols(props) {
                                 </TableContainer>
                                 {
                                     protocolCount > 20 &&
-                                    <Pagination count={Math.ceil(protocolCount / 20)} page={page_number}
-                                                onChange={handlePageChange}/>
+                                    <Box sx={{display: "flex", justifyContent: "center", mt: 2}}>
+                                        <Pagination count={Math.ceil(protocolCount / 20)} page={page_number}
+                                                    onChange={handlePageChange}/>
+                                    </Box>
                                 }
                             </Box>
                         }
-                            {
-                                openDelete &&
-                                <DeleteProtocol protocol={selectedProtocol} open={openDelete} setOpen={setOpenDelete}
-                                                updateData={getData}/>
-                            }
+                        {
+                            openDelete &&
+                            <DeleteProtocol protocol={selectedProtocol} open={openDelete} setOpen={setOpenDelete}
+                                            updateData={getData}/>
+                        }
                     </>
             }
         </Container>
