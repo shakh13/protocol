@@ -1107,12 +1107,12 @@ def update_protocol_status(request, pk):
             ]
             request.data['data'] = json.dumps(data)
         protocol.status = request.data['status']
-        if request.data['status'] == 1:
+        if request.data['status'] != 0:
             saved_machines = [
                 {
                     'name': m.name,
                     'certificate': m.certificate_number,
-                    'expiry_date': m.certificate_expiry_date,
+                    'expiry_date': m.certificate_expiry_date.strftime("%d.%m.%Y"),
                 }
                 for m in protocol.machines.all()
             ]

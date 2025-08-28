@@ -89,49 +89,84 @@ export default function AdminProtocols(props) {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {protocols.map((protocol, index) => (
-                                                <TableRow key={protocol.id}>
-                                                    <TableCell>
-                                                        <Link href={"/admin/protocol/" + protocol.id} underline="none">
-                                                            {
-                                                                protocol.building
-                                                                    ? protocol.building.prefix + ' - ' + protocol.building_protocol_number
-                                                                    : protocol.building_protocol_number
-                                                            }
-                                                        </Link>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Link
-                                                            href={"/admin/client/" + protocol.client.id}
-                                                            underline="none"
-                                                        >
-                                                            {protocol.client.name}
-                                                        </Link>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {protocol.building &&
-                                                            <Link
-                                                                href={"/admin/building/" + protocol.building.id}
-                                                                underline="none"
-                                                            >
-                                                                {protocol.building.name}
-                                                            </Link>
-                                                        }
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Tooltip title="Удалить">
-                                                            <IconButton
-                                                                sx={{marginLeft: '5px'}}
-                                                                edge="end"
-                                                                variant="contained"
-                                                                onClick={handleDelete(protocol)}
-                                                            >
-                                                                <DeleteIcon/>
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {protocols.map((protocol, index) => {
+                                                const bg = [
+                                                    'transparent',
+                                                    'rgba(14, 227, 85, 0.42)',
+                                                    'rgba(14, 106, 227, 0.42)',
+                                                    'rgba(238, 107, 60, 0.42)',
+                                                ]
+
+                                                const tooltips = [
+                                                    'Можно редактировать',
+                                                    'Завершен',
+                                                    'Запрос на редактирование отправлен',
+                                                    'Отказ на редактирование',
+                                                ]
+                                                return (
+                                                    <Tooltip
+                                                        title={tooltips[protocol.status]}
+                                                        placement="top"
+                                                        arrow
+                                                        key={protocol.id}
+                                                        slotProps={{
+                                                            popper: {
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'offset',
+                                                                        options: {
+                                                                            offset: [0, -14],
+                                                                        },
+                                                                    },
+                                                                ],
+                                                            },
+                                                        }}
+                                                    >
+                                                        <TableRow sx={{backgroundColor: bg[protocol.status]}}>
+                                                            <TableCell>
+                                                                <Link href={"/admin/protocol/" + protocol.id}
+                                                                      underline="none">
+                                                                    {
+                                                                        protocol.building
+                                                                            ? protocol.building.prefix + ' - ' + protocol.building_protocol_number
+                                                                            : protocol.building_protocol_number
+                                                                    }
+                                                                </Link>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Link
+                                                                    href={"/admin/client/" + protocol.client.id}
+                                                                    underline="none"
+                                                                >
+                                                                    {protocol.client.name}
+                                                                </Link>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {protocol.building &&
+                                                                    <Link
+                                                                        href={"/admin/building/" + protocol.building.id}
+                                                                        underline="none"
+                                                                    >
+                                                                        {protocol.building.name}
+                                                                    </Link>
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Tooltip title="Удалить">
+                                                                    <IconButton
+                                                                        sx={{marginLeft: '5px'}}
+                                                                        edge="end"
+                                                                        variant="contained"
+                                                                        onClick={handleDelete(protocol)}
+                                                                    >
+                                                                        <DeleteIcon/>
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </Tooltip>
+                                                )
+                                            })}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
