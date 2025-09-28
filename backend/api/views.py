@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.db.models.functions import TruncQuarter
 from django.shortcuts import render
@@ -64,6 +65,21 @@ from qrcode_styled.pil.image import PilStyledImage
 import qrcode_styled
 
 from rest_framework.pagination import PageNumberPagination
+
+
+def fix_unicode_sequence(text):
+    if not isinstance(text, str):
+        return text
+
+    # If the text contains u041f-style sequences (without backslashes)
+    # but doesn't contain actual Cyrillic characters or proper escape sequences
+    if (re.search(r'u[0-9a-fA-F]{4}', text) and
+            not any('\u0400' <= c <= '\u04FF' for c in text) and
+            '\\u' not in text):
+        pattern = r'u([0-9a-fA-F]{4})'
+        return re.sub(pattern, lambda m: chr(int(m.group(1), 16)), text)
+
+    return text
 
 
 def qr_generator(data):
@@ -381,10 +397,11 @@ def generate_protocol_pdf(request, pk):
             ]
 
         machines = json.loads(protocol['saved_machines'])
+
         for machine in machines:
             TABLE_DATA.append([
-                machine['name'],
-                machine['certificate'],
+                fix_unicode_sequence(machine['name']),
+                fix_unicode_sequence(machine['certificate']),
                 machine['expiry_date'],
             ])
         # for machine in protocol['machines']:
@@ -414,7 +431,7 @@ def generate_protocol_pdf(request, pk):
 
         pdf.ln(5)
 
-        data = json.loads(protocol['data'])
+        data = json.loads(fix_unicode_sequence(protocol['data'].replace("\n", "")))
 
         if len(data) > 0:
             settings = json.loads(protocol['type']['settings'])

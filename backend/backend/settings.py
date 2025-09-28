@@ -104,12 +104,31 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'rtctest',  # Database name
+        'USER': 'rtctest',  # MySQL username
+        'PASSWORD': 'shakh123',  # MySQL password
+        'HOST': '185.191.141.127',  # Database host (or IP address)
+        'PORT': '3306',  # MySQL port (default is 3306)
+        'OPTIONS': {
+            'autocommit': True,
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+        },
+        'TIME_ZONE': 'UTC',  # Or your preferred timezone
     }
 }
+
+DEFAULT_CHARSET = 'utf-8'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

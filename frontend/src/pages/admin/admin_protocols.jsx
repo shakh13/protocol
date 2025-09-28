@@ -46,7 +46,7 @@ export default function AdminProtocols(props) {
         let pn = page ? '?page=' + page : '';
         AxiosInstance.get("all_protocols" + pn)
             .then((response) => {
-                // console.log(response.data);
+                console.log(response);
                 setProtocolCount(response.data['count']);
                 setPrevPage(response.data['previous']);
                 setNextPage(response.data['next']);
@@ -54,6 +54,7 @@ export default function AdminProtocols(props) {
                 setLoading(false);
             })
             .catch((error) => {
+                console.log(error);
                 Swal.fire({
                     title: error,
                     icon: "error",

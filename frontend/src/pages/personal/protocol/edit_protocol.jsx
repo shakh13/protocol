@@ -99,7 +99,17 @@ export default function EditProtocol(props) {
     });
 
     function loadProtocolData() {
-        const data = JSON.parse(protocol.data);
+        let fixedJson = protocol.data
+            .replace(/\n/g, ' ')  // Replace newlines with spaces
+            .replace(/\r/g, ' ')  // Replace carriage returns with spaces
+            .replace(/\t/g, ' ')  // Replace tabs with spaces
+            .replace(/",\s+"/g, '","')  // Fix line breaks between array elements
+            .replace(/":\s+"/g, '":"')  // Fix line breaks after colons
+            .replace(/"\s+,/g, '",')    // Fix spaces before commas
+            .replace(/\s+/g, ' ')       // Collapse multiple spaces
+            .trim();
+        
+        const data = JSON.parse(fixedJson);
 
         if (data.length > 0) {
             data.map((d, index) => {
@@ -111,12 +121,21 @@ export default function EditProtocol(props) {
     }
 
     function getData() {
-        setSettings(JSON.parse(protocol.type.settings));
+        let fixedJson = protocol.type.settings
+            .replace(/\n/g, ' ')  // Replace newlines with spaces
+            .replace(/\r/g, ' ')  // Replace carriage returns with spaces
+            .replace(/\t/g, ' ')  // Replace tabs with spaces
+            .replace(/",\s+"/g, '","')  // Fix line breaks between array elements
+            .replace(/":\s+"/g, '":"')  // Fix line breaks after colons
+            .replace(/"\s+,/g, '",')    // Fix spaces before commas
+            .replace(/\s+/g, ' ')       // Collapse multiple spaces
+            .trim();
+        setSettings(JSON.parse(fixedJson));
 
         loadProtocolData();
 
         setSelectedLang(protocol.language);
-        
+
         setValue("machines", (protocol.machines || []).map((machine) => {
             return {
                 value: {

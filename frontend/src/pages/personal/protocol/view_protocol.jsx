@@ -13,8 +13,26 @@ export default function ViewProtocol(props) {
     const [machines, setMachines] = useState([]);
 
     function getData() {
-        const s = JSON.parse(protocol.type.settings);
-        const m = JSON.parse(protocol.saved_machines);
+        let settingsJson = protocol.type.settings
+            .replace(/\n/g, ' ')  // Replace newlines with spaces
+            .replace(/\r/g, ' ')  // Replace carriage returns with spaces
+            .replace(/\t/g, ' ')  // Replace tabs with spaces
+            .replace(/",\s+"/g, '","')  // Fix line breaks between array elements
+            .replace(/":\s+"/g, '":"')  // Fix line breaks after colons
+            .replace(/"\s+,/g, '",')    // Fix spaces before commas
+            .replace(/\s+/g, ' ')       // Collapse multiple spaces
+            .trim();
+        let machinesJson = protocol.saved_machines
+            .replace(/\n/g, ' ')  // Replace newlines with spaces
+            .replace(/\r/g, ' ')  // Replace carriage returns with spaces
+            .replace(/\t/g, ' ')  // Replace tabs with spaces
+            .replace(/",\s+"/g, '","')  // Fix line breaks between array elements
+            .replace(/":\s+"/g, '":"')  // Fix line breaks after colons
+            .replace(/"\s+,/g, '",')    // Fix spaces before commas
+            .replace(/\s+/g, ' ')       // Collapse multiple spaces
+            .trim();
+        const s = JSON.parse(settingsJson);
+        const m = JSON.parse(machinesJson);
         setMachines(m);
 
         setSettings(s);
@@ -23,7 +41,17 @@ export default function ViewProtocol(props) {
             setProtocolHeaders(s.headers);
         }
 
-        setProtocolData(JSON.parse(protocol.data));
+        let fixedJson = protocolData
+            .replace(/\n/g, ' ')  // Replace newlines with spaces
+            .replace(/\r/g, ' ')  // Replace carriage returns with spaces
+            .replace(/\t/g, ' ')  // Replace tabs with spaces
+            .replace(/",\s+"/g, '","')  // Fix line breaks between array elements
+            .replace(/":\s+"/g, '":"')  // Fix line breaks after colons
+            .replace(/"\s+,/g, '",')    // Fix spaces before commas
+            .replace(/\s+/g, ' ')       // Collapse multiple spaces
+            .trim();
+
+        setProtocolData(JSON.parse(fixedJson));
     }
 
     useEffect(() => {

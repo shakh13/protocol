@@ -72,10 +72,19 @@ export default function CreatePage(props) {
             .then((response) => {
                 let pt = []
                 response.data.forEach((ptype) => {
+                    let fixedJson = ptype.settings
+                        .replace(/\n/g, ' ')  // Replace newlines with spaces
+                        .replace(/\r/g, ' ')  // Replace carriage returns with spaces
+                        .replace(/\t/g, ' ')  // Replace tabs with spaces
+                        .replace(/",\s+"/g, '","')  // Fix line breaks between array elements
+                        .replace(/":\s+"/g, '":"')  // Fix line breaks after colons
+                        .replace(/"\s+,/g, '",')    // Fix spaces before commas
+                        .replace(/\s+/g, ' ')       // Collapse multiple spaces
+                        .trim();
                     pt.push({
                         value: ptype.id,
                         label: ptype.name,
-                        settings: JSON.parse(ptype.settings),
+                        settings: JSON.parse(fixedJson),
                     });
                 });
                 setProtocolTypes(pt);
