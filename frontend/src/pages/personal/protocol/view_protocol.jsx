@@ -12,6 +12,21 @@ export default function ViewProtocol(props) {
     const [protocolData, setProtocolData] = useState([]);
     const [machines, setMachines] = useState([]);
 
+    function fixUnicodeSequence(text) {
+        // Check if text contains uXXXX patterns but no actual Cyrillic characters
+        const hasUnicodePattern = /u[0-9a-fA-F]{4}/.test(text);
+        const hasCyrillicChars = /[\u0400-\u04FF]/.test(text);
+        const hasEscapedUnicode = text.includes('\\u');
+
+        if (hasUnicodePattern && !hasCyrillicChars && !hasEscapedUnicode) {
+            return text.replace(/u([0-9a-fA-F]{4})/g, (match, hex) =>
+                String.fromCharCode(parseInt(hex, 16))
+            );
+        }
+
+        return text;
+    }
+
     function getData() {
         let settingsJson = protocol.type.settings
             .replace(/\n/g, ' ')  // Replace newlines with spaces
@@ -32,7 +47,7 @@ export default function ViewProtocol(props) {
             .replace(/\s+/g, ' ')       // Collapse multiple spaces
             .trim();
         const s = JSON.parse(settingsJson);
-        const m = JSON.parse(machinesJson);
+        const m = JSON.parse(fixUnicodeSequence(machinesJson));
         setMachines(m);
 
         setSettings(s);
@@ -41,7 +56,7 @@ export default function ViewProtocol(props) {
             setProtocolHeaders(s.headers);
         }
 
-        let fixedJson = protocolData
+        let fixedJson = protocol.data
             .replace(/\n/g, ' ')  // Replace newlines with spaces
             .replace(/\r/g, ' ')  // Replace carriage returns with spaces
             .replace(/\t/g, ' ')  // Replace tabs with spaces
@@ -51,7 +66,8 @@ export default function ViewProtocol(props) {
             .replace(/\s+/g, ' ')       // Collapse multiple spaces
             .trim();
 
-        setProtocolData(JSON.parse(fixedJson));
+
+        setProtocolData(JSON.parse(fixUnicodeSequence(fixedJson)));
     }
 
     useEffect(() => {
@@ -86,7 +102,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.product_name}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.product_name_eng}`
+                        (<>
+                            <br/>
+                            {protocol.product_name_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -95,7 +114,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.building_data}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.building_data_eng}`
+                        (<>
+                            <br/>
+                            {protocol.building_data_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -104,7 +126,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.producer_name}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.product_name_eng}`
+                        (<>
+                            <br/>
+                            {protocol.producer_name_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -113,7 +138,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.test_type}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.test_type_eng}`
+                        (<>
+                            <br/>
+                            {protocol.test_type_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -122,7 +150,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.rd_test_building}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.rd_test_building_eng}`
+                        (<>
+                            <br/>
+                            {protocol.rd_test_building_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -131,7 +162,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.rd_test_method}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.rd_test_method_eng}`
+                        (<>
+                            <br/>
+                            {protocol.rd_test_method_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -140,7 +174,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.addition}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.addition_eng}`
+                        (<>
+                            <br/>
+                            {protocol.addition_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>
@@ -149,7 +186,10 @@ export default function ViewProtocol(props) {
                 <Grid size={8}>
                     {protocol.subcontractor}
                     {protocol.language === 'en' &&
-                        `<br/>${protocol.subcontractor_eng}`
+                        (<>
+                            <br/>
+                            {protocol.subcontractor_eng}
+                        </>)
                     }
                 </Grid>
                 <Grid size={4}>

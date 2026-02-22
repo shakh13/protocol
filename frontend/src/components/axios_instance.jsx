@@ -5,8 +5,8 @@ import axios from "axios";
 function baseUrl() {
     const serverIP = window.location.hostname; // This will give the current hostname or IP if you're not using a domain
     // console.log("Current Server IP:", serverIP);
-    return "http://0.0.0.0:8000/";
-    // return "http://185.191.141.127:8000/";
+    // return "http://0.0.0.0:8000/";
+    return "http://185.191.141.127:8000/";
     // return "http://" + serverIP + ":8000/";
 }
 
@@ -14,7 +14,7 @@ const AxiosInstance = axios.create({
     baseURL: baseUrl(),
     // timeout: 5000,
     headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=utf-8",
         accept: "application/json",
     }
 });

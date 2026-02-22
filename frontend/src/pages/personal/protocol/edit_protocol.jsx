@@ -98,6 +98,21 @@ export default function EditProtocol(props) {
         name: "machines",
     });
 
+    function fixUnicodeSequence(text) {
+        // Check if text contains uXXXX patterns but no actual Cyrillic characters
+        const hasUnicodePattern = /u[0-9a-fA-F]{4}/.test(text);
+        const hasCyrillicChars = /[\u0400-\u04FF]/.test(text);
+        const hasEscapedUnicode = text.includes('\\u');
+
+        if (hasUnicodePattern && !hasCyrillicChars && !hasEscapedUnicode) {
+            return text.replace(/u([0-9a-fA-F]{4})/g, (match, hex) =>
+                String.fromCharCode(parseInt(hex, 16))
+            );
+        }
+
+        return text;
+    }
+
     function loadProtocolData() {
         let fixedJson = protocol.data
             .replace(/\n/g, ' ')  // Replace newlines with spaces
@@ -108,8 +123,8 @@ export default function EditProtocol(props) {
             .replace(/"\s+,/g, '",')    // Fix spaces before commas
             .replace(/\s+/g, ' ')       // Collapse multiple spaces
             .trim();
-        
-        const data = JSON.parse(fixedJson);
+
+        const data = JSON.parse(fixUnicodeSequence(fixedJson));
 
         if (data.length > 0) {
             data.map((d, index) => {
@@ -140,7 +155,7 @@ export default function EditProtocol(props) {
             return {
                 value: {
                     value: machine.id,
-                    label: machine.name,
+                    label: fixUnicodeSequence(machine.name),
                 }
             };
         }));

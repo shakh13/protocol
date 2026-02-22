@@ -122,7 +122,7 @@ DATABASES = {
         'OPTIONS': {
             'autocommit': True,
             'charset': 'utf8mb4',
-            'use_unicode': True,
+            'use_unicode': False,
         },
         'TIME_ZONE': 'UTC',  # Or your preferred timezone
     }
